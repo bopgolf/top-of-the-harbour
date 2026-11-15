@@ -1,0 +1,404 @@
+{
+"id": 1228899,
+"name": "The Clubroom Tauranga Futures Open - 18 Holes",
+"holes": 18,
+"date": "2026-03-08",
+"has_stableford": true,
+"entries": [
+[
+"Climo, Manaia",
+"Omanu Golf Club",
+"45"
+],
+[
+"Wooten, Eli",
+"Tauranga Golf Club",
+"43"
+],
+[
+"Souter, Nero",
+"Mount Maunganui Golf Club",
+"42"
+],
+[
+"Lee, Rayeon",
+"Omanu Golf Club",
+"42"
+],
+[
+"Lee, Daniel",
+"Mount Maunganui Golf Club",
+"42"
+],
+[
+"Kim, Noël",
+"Mount Maunganui Golf Club",
+"41"
+],
+[
+"Beazley, Taylor",
+"Futures Geyserland",
+"40"
+],
+[
+"Uerata, Nealson",
+"Futures Geyserland",
+"40"
+],
+[
+"Armer, Fletcher",
+"Waikite Valley Golf Club",
+"40"
+],
+[
+"France, Dakota",
+"Futures Geyserland",
+"40"
+],
+[
+"Whelan, Leo",
+"Taupo Golf Club",
+"40"
+],
+[
+"Bang, Olivia",
+"Futures Geyserland",
+"39"
+],
+[
+"Hermon, Precious",
+"Opotiki Golf Club",
+"39"
+],
+[
+"Lukis, Rydah",
+"Futures Geyserland",
+"39"
+],
+[
+"Weston, Dominick",
+"Taupo Golf Club",
+"39"
+],
+[
+"Lourie, Mason",
+"Te Puke Golf Club",
+"39"
+],
+[
+"Spencer, Blake",
+"Tauranga Golf Club",
+"37"
+],
+[
+"Ellis, Elijah",
+"Tauranga Golf Club",
+"37"
+],
+[
+"Wilson Maldonado, Alba",
+"Taupo Golf Club",
+"37"
+],
+[
+"Tamihana, Taio Terangi",
+"Omanu Golf Club",
+"37"
+],
+[
+"Williams, Perry",
+"Tauranga Golf Club",
+"36"
+],
+[
+"Pugh, Levon",
+"Omanu Golf Club",
+"36"
+],
+[
+"Benjamin, Luca",
+"Tauranga Golf Club",
+"36"
+],
+[
+"Teepa-Tarau, Bayleigh",
+"Whakatane Golf Club",
+"36"
+],
+[
+"Rogers, Beau",
+"Waihi Golf Club",
+"36"
+],
+[
+"Leach, Mason",
+"Tauranga Golf Club",
+"35"
+],
+[
+"Montgomerie, Archie",
+"Tauranga Golf Club",
+"34"
+],
+[
+"Taylor, James",
+"Tauranga Golf Club",
+"34"
+],
+[
+"Murdoch, Maxwell",
+"Mount Maunganui Golf Club",
+"34"
+],
+[
+"Mills, Lachie",
+"Tauranga Golf Club",
+"34"
+],
+[
+"Deetlefs, Landré",
+"Futures Geyserland",
+"34"
+],
+[
+"Morrison, Anaru",
+"Futures Geyserland",
+"34"
+],
+[
+"Climo, Waimana",
+"Omanu Golf Club",
+"34"
+],
+[
+"Mills, Michael",
+"Taupo Golf Club",
+"33"
+],
+[
+"Davies, Tysen",
+"Omokoroa Golf Club",
+"33"
+],
+[
+"Sanford, Floyd",
+"Futures Geyserland",
+"33"
+],
+[
+"McKinley, Tommy",
+"Mount Maunganui Golf Club",
+"33"
+],
+[
+"Rae, Cameron",
+"Otumoetai Golf Club",
+"33"
+],
+[
+"O'Rourke, Zachary",
+"Te Puke Golf Club",
+"33"
+],
+[
+"Smith, Dion",
+"Mount Maunganui Golf Club",
+"32"
+],
+[
+"Hona, Leo",
+"Tauranga Golf Club",
+"32"
+],
+[
+"Birchall, Natasha",
+"Taupo Golf Club",
+"32"
+],
+[
+"Redward, Louie",
+"Whakatane Golf Club",
+"32"
+],
+[
+"Emery, Rylan",
+"Futures Geyserland",
+"31"
+],
+[
+"Willett, Toby",
+"Te Puke Golf Club",
+"31"
+],
+[
+"Lee, Harper",
+"Mount Maunganui Golf Club",
+"31"
+],
+[
+"Beach, Henley",
+"Mount Maunganui Golf Club",
+"31"
+],
+[
+"Induruwage, Linaya",
+"Taupo Golf Club",
+"31"
+],
+[
+"Wilson Maldonado, Martina",
+"Taupo Golf Club",
+"31"
+],
+[
+"Perry-McFetridge, Ethan",
+"Futures Geyserland",
+"31"
+],
+[
+"Balmer, Tom",
+"Tauranga Golf Club",
+"31"
+],
+[
+"Nicholson, Brodie",
+"Futures Geyserland",
+"30"
+],
+[
+"Magatogia, Casey",
+"Futures Geyserland",
+"30"
+],
+[
+"Jonck, Harrison",
+"Mount Maunganui Golf Club",
+"30"
+],
+[
+"Manihera, Jackson",
+"Omanu Golf Club",
+"30"
+],
+[
+"Smith, Eli",
+"Te Puke Golf Club",
+"29"
+],
+[
+"Smith, Sebastian",
+"Omokoroa Golf Club",
+"29"
+],
+[
+"Owen, Luke",
+"Whakatane Golf Club",
+"29"
+],
+[
+"Beazley, Rome",
+"Futures Geyserland",
+"29"
+],
+[
+"Aldridge, Levi",
+"Whakatane Golf Club",
+"28"
+],
+[
+"Morgan, Noah",
+"Taupo Golf Club",
+"28"
+],
+[
+"Foote, Nathan",
+"Tauranga Golf Club",
+"27"
+],
+[
+"Shipgood, Kauri-Makaio",
+"Futures Geyserland",
+"27"
+],
+[
+"Belch, Finn",
+"Tauranga Golf Club",
+"26"
+],
+[
+"Davies, E J",
+"Tauranga Golf Club",
+"26"
+],
+[
+"Stairmand, Carter",
+"Taupo Golf Club",
+"26"
+],
+[
+"Tulloch, Mason",
+"Mount Maunganui Golf Club",
+"25"
+],
+[
+"Gibson, Ryan",
+"Mount Maunganui Golf Club",
+"25"
+],
+[
+"Hona, Benson",
+"Tauranga Golf Club",
+"24"
+],
+[
+"McHugh, Maretta",
+"Mount Maunganui Golf Club",
+"24"
+],
+[
+"Dromgool, Tait",
+"Omanu Golf Club",
+"24"
+],
+[
+"Lourie, Nate",
+"Te Puke Golf Club",
+"24"
+],
+[
+"McHugh, Myles",
+"Mount Maunganui Golf Club",
+"23"
+],
+[
+"Lee, Wilfred",
+"Omokoroa Golf Club",
+"23"
+],
+[
+"Barnes, Wesley",
+"Omanu Golf Club",
+"22"
+],
+[
+"Goslett, Blake",
+"Tauranga Golf Club",
+"22"
+],
+[
+"Rika, Jewel",
+"Futures Geyserland",
+"20"
+],
+[
+"Ngatai, Ray J",
+"Omanu Golf Club",
+"17"
+],
+[
+"Teepa-Tarau, Mere",
+"Whakatane Golf Club",
+"16"
+]
+]
+}
