@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top of the Harbour Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a clubhouse scoreboard. Deep fairway-green header band, white board, gold marks the scores that count. */
+:root {
+  --bg: #f3f5f2;
+  --board: #ffffff;
+  --ink: #17231c;
+  --muted: #5d6b62;
+  --line: #dde3dd;
+  --green: #12432f;
+  --green-2: #1d5c42;
+  --gold: #e7b93c;
+  --gold-soft: #fbefc9;
+  --gold-ink: #6b4d00;
+  --stripe: #f7f9f6;
+  --display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1612; --board: #161f1a; --ink: #e6ece7; --muted: #9aa89e; --line: #2a3630;
+    --green: #0d3323; --green-2: #1a4d38; --gold: #e7b93c; --gold-soft: #3b3215; --gold-ink: #f3d27a; --stripe: #1a241e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1612; --board: #161f1a; --ink: #e6ece7; --muted: #9aa89e; --line: #2a3630;
+  --green: #0d3323; --green-2: #1a4d38; --gold: #e7b93c; --gold-soft: #3b3215; --gold-ink: #f3d27a; --stripe: #1a241e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+header.band { background: var(--green); color: #fff; padding: 28px 16px 0; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+header.band .wrap { padding: 0; max-width: 1208px; }
+.eyebrow { font-family: var(--display); letter-spacing: .14em; text-transform: uppercase; font-size: 14px; color: var(--gold); font-weight: 600; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(32px, 6vw, 52px); line-height: 1; margin: 6px 0 8px; text-wrap: balance; }
+.sub { color: #cfe0d6; font-size: 15px; max-width: 70ch; margin: 0 0 18px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); color: #fff; border-radius: 999px; padding: 3px 12px; font-size: 13px; }
+.chip.final { background: var(--gold); color: #3a2a00; border-color: var(--gold); font-weight: 700; }
+nav.tabs { display: flex; gap: 4px; overflow-x: auto; }
+nav.tabs a { font-family: var(--display); font-size: 18px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #cfe0d6; text-decoration: none; padding: 10px 18px; border-radius: 8px 8px 0 0; white-space: nowrap; }
+nav.tabs a[aria-current="page"] { background: var(--bg); color: var(--green); }
+:root[data-theme="dark"] nav.tabs a[aria-current="page"] { color: var(--gold); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) nav.tabs a[aria-current="page"] { color: var(--gold); } }
+nav.tabs a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+main { padding: 22px 0 40px; }
+.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.pod { background: var(--board); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 2px; border-top: 5px solid var(--line); }
+.pod.p1 { border-top-color: var(--gold); }
+.pod .pos { font-family: var(--display); font-size: 14px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+.pod .name { font-weight: 700; font-size: 17px; }
+.pod .pts { font-family: var(--display); font-size: 36px; font-weight: 700; color: var(--green-2); line-height: 1; font-variant-numeric: tabular-nums; }
+:root[data-theme="dark"] .pod .pts { color: var(--gold); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pod .pts { color: var(--gold); } }
+.pod .gap { color: var(--muted); font-size: 13px; }
+.panel { background: var(--board); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.panel-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.panel-head h2 { font-family: var(--display); font-size: 22px; margin: 0; font-weight: 700; letter-spacing: .02em; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--muted); align-items: center; }
+.sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 4px; background: var(--gold-soft); border: 1px solid var(--gold); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 8px; text-align: center; border-bottom: 1px solid var(--line); white-space: nowrap; }
+thead th { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--stripe); vertical-align: bottom; }
+thead th .ev { display: block; font-family: var(--body); font-size: 11px; letter-spacing: 0; text-transform: none; font-weight: 400; white-space: normal; min-width: 64px; max-width: 92px; margin: 2px auto 0; line-height: 1.2; }
+tbody tr:nth-child(even) td { background: var(--stripe); }
+td.left, th.left { text-align: left; }
+td.pos { font-family: var(--display); font-size: 19px; font-weight: 700; width: 52px; }
+td.club { font-weight: 600; }
+td.total { font-family: var(--display); font-size: 21px; font-weight: 700; color: var(--green-2); }
+:root[data-theme="dark"] td.total { color: var(--gold); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) td.total { color: var(--gold); } }
+td.count { background: var(--gold-soft) !important; color: var(--gold-ink); font-weight: 700; box-shadow: inset 0 0 0 1px var(--gold); }
+td.dash, td.cx { color: var(--muted); }
+td.cx { font-size: 11px; letter-spacing: .06em; }
+th.sticky, td.sticky { position: sticky; left: 0; z-index: 1; background: var(--board); }
+tbody tr:nth-child(even) td.sticky { background: var(--stripe); }
+td.ne { color: var(--muted); font-size: 12px; }
+.sep td { background: var(--bg) !important; color: var(--muted); font-size: 13px; text-align: left; font-weight: 600; }
+.note { color: var(--muted); font-size: 13px; padding: 12px 16px; margin: 0; max-width: 90ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label.ctl { display: grid; gap: 2px; font-size: 12px; color: var(--muted); font-weight: 600; }
+select, input[type="search"] { font: inherit; font-size: 15px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--board); color: var(--ink); min-width: 200px; }
+.evtitle { font-family: var(--display); font-size: 26px; font-weight: 700; margin: 0; }
+.evmeta { color: var(--muted); font-size: 14px; }
+.player small { display: block; color: var(--muted); font-size: 12px; }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); }
+footer a, .note a { color: inherit; }
+footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
+[hidden] { display: none !important; }
+@media (max-width: 640px) {
+  .podium { grid-template-columns: 1fr; }
+  .pod { grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; }
+  .pod .pts { font-size: 28px; }
+  th, td { padding: 7px 6px; }
+}
+@media (prefers-reduced-motion: no-preference) { nav.tabs a { transition: background .15s, color .15s; } }
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <div class="eyebrow">Bay of Plenty Golf · Futures Series</div>
+    <h1 id="title">Top of the Harbour</h1>
+    <p class="sub" id="subtitle">Clubs compete as teams across ten junior and Futures opens. The best three stableford scores from each club count at every event, and each club's best six events make up its season total.</p>
+    <div class="meta" id="meta"></div>
+    <nav class="tabs" aria-label="Leaderboard views">
+      <a href="#clubs" data-view="clubs">Club teams</a>
+      <a href="#players" data-view="players">Individuals</a>
+      <a href="#events" data-view="events">Event results</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+  <section id="view-clubs">
+    <div class="podium" id="podium"></div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Club teams leaderboard</h2>
+        <div class="legend"><span><span class="sw"></span><span id="countLegend">Counts toward total</span></span><span>– did not play</span></div>
+      </div>
+      <div class="scroll"><table id="clubTable"></table></div>
+      <p class="note" id="clubNote"></p>
+    </div>
+  </section>
+
+  <section id="view-players" hidden>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Individual leaderboard</h2>
+        <div class="controls">
+          <label class="ctl" for="clubFilter">Club<select id="clubFilter"><option value="">All clubs</option></select></label>
+          <label class="ctl" for="search">Find a player<input type="search" id="search" placeholder="Type a name"></label>
+        </div>
+      </div>
+      <div class="scroll"><table id="playerTable"></table></div>
+      <p class="note">Scores are 18-hole stableford points. Nine-hole scores include the 17 points added under the World Handicap System. Season total is the sum of every round played.</p>
+    </div>
+  </section>
+
+  <section id="view-events" hidden>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="evtitle" id="evTitle"></p>
+          <div class="evmeta" id="evMeta"></div>
+        </div>
+        <div class="controls">
+          <label class="ctl" for="roundPick">Round<select id="roundPick"></select></label>
+        </div>
+      </div>
+      <div class="scroll"><table id="eventTable"></table></div>
+      <p class="note" id="evSources"></p>
+      <p class="note">The three highest scores from each club make up its event score. Where a club had three or fewer players, every score counts.</p>
+    </div>
+  </section>
+  <section id="view-check" hidden>
+    <div class="panel">
+      <div class="panel-head"><h2>Data check</h2><a href="#clubs">Back to the leaderboard</a></div>
+      <p class="note">This page is for the organiser. It lists anything the updater couldn't use, so you can fix it in <strong>overrides.csv</strong> or <strong>clubs.csv</strong>.</p>
+      <div id="checkBody"></div>
+    </div>
+  </section>
+</main>
+<footer id="footer"></footer>
+</div>
+
+<script>
+fetch("data/leaderboard.json", { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(render).catch(err => {
+  document.querySelector("main").innerHTML = '<div class="panel"><p class="empty">The leaderboard data could not be loaded (' + err.message + '). Try refreshing the page.</p></div>';
+});
+function render(D) {
+  const S = D.settings;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const fmtDate = iso => iso ? new Date(iso + "T12:00:00").toLocaleDateString("en-NZ", { day: "numeric", month: "short" }) : "";
+  const R = D.rounds;
+  const clubNames = new Set(D.clubs.map(c => c.name));
+
+  // ---- clean results ----
+  const seen = new Set();
+  const rows = [];
+  for (const [round, player, club, holes, pts] of D.results) {
+    const rd = R[round - 1];
+    if (!rd || rd.cancelled || !player || !clubNames.has(club) || typeof pts !== "number") continue;
+    const key = round + "|" + player.trim() + "|" + club;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    rows.push({ round, player: player.trim(), club, score: pts + (holes === 9 ? S.nineHoleAdd : 0) });
+  }
+  const played = R.map(r => !r.cancelled && rows.some(x => x.round === r.n));
+
+  // ---- club calculations ----
+  const clubs = D.clubs.map(c => {
+    const byRound = R.map(r => {
+      if (r.cancelled) return { kind: "cx" };
+      if (!played[r.n - 1]) return { kind: "future" };
+      const mine = rows.filter(x => x.round === r.n && x.club === c.name).sort((a, b) => b.score - a.score);
+      const top = mine.slice(0, S.perClub);
+      return { kind: "num", total: top.reduce((s, x) => s + x.score, 0), top, n: mine.length, best: mine.length ? mine[0].score : 0 };
+    });
+    const nums = byRound.map((b, i) => ({ i, v: b.kind === "num" ? b.total : null })).filter(x => x.v !== null && x.v > 0);
+    const counted = new Set([...nums].sort((a, b) => b.v - a.v || a.i - b.i).slice(0, S.bestEvents).map(x => x.i));
+    const total = [...counted].reduce((s, i) => s + byRound[i].total, 0);
+    const bestRound = nums.length ? Math.max(...nums.map(x => x.v)) : 0;
+    const bestInd = nums.filter(x => x.v === bestRound).reduce((m, x) => Math.max(m, byRound[x.i].best), 0);
+    return { ...c, byRound, counted, total, events: nums.length, bestRound, bestInd };
+  }).filter(c => c.events > 0 || rows.length === 0);
+  const cmp = (a, b) => b.total - a.total || b.bestRound - a.bestRound || b.bestInd - a.bestInd;
+  const eligible = clubs.filter(c => c.bop).sort((a, b) => cmp(a, b) || a.name.localeCompare(b.name));
+  eligible.forEach(c => { c.pos = 1 + eligible.filter(o => cmp(o, c) < 0).length; });
+  const shared = new Set(eligible.map(c => c.pos).filter((p, i, a) => a.indexOf(p) !== i));
+  const others = clubs.filter(c => !c.bop).sort(cmp);
+
+  // ---- header ----
+  const playedCount = played.filter(Boolean).length;
+  const scheduled = R.filter(r => !r.cancelled).length;
+  document.getElementById("title").textContent = D.season + " " + (D.title || "Top of the Harbour");
+  document.title = D.season + " " + (D.title || "Top of the Harbour") + " Leaderboard";
+  document.getElementById("meta").innerHTML =
+    (D.status === "Final" ? '<span class="chip final">Final standings</span>' : '<span class="chip">After round ' + Math.max(0, ...R.filter((r, i) => played[i]).map(r => r.n)) + '</span>') +
+    '<span class="chip">' + playedCount + " of " + scheduled + " events played</span>" +
+    '<span class="chip">' + new Set(rows.map(r => r.player + "|" + r.club)).size + " players</span>" +
+    '<span class="chip">Updated ' + new Date(D.updated).toLocaleString("en-NZ", { timeZone: "Pacific/Auckland", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit" }) + "</span>";
+  document.getElementById("countLegend").textContent = "Counts toward total (best " + S.bestEvents + " events)";
+  document.getElementById("footer").innerHTML = esc((D.title || "Top of the Harbour") + " " + D.season + " · Ties are decided by best single-event club total, then by the best individual score in that event. If still tied, positions are shared.") + ' <a href="#check">Data check</a>';
+
+  const roundHead = (prefix) => R.map(r => '<th scope="col">' + prefix + r.n + '<span class="ev">' + esc(r.event) + (r.date ? " · " + fmtDate(r.date) : "") + "</span></th>").join("");
+
+  // ---- podium ----
+  const leader = eligible[0];
+  document.getElementById("podium").innerHTML = eligible.slice(0, 3).map((c, i) =>
+    '<div class="pod p' + (i + 1) + '"><span class="pos">' + (shared.has(c.pos) ? "T" : "") + ordinal(c.pos) + '</span><span class="name">' + esc(c.name) +
+    '</span><span class="pts">' + c.total + '</span><span class="gap">' + (i === 0 ? c.events + " events played" : (leader.total - c.total) + " behind the leader") + "</span></div>").join("");
+  function ordinal(n) { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+
+  // ---- club table ----
+  const cell = (c, i) => {
+    const b = c.byRound[i];
+    if (b.kind === "cx") return '<td class="cx">CANC.</td>';
+    if (b.kind === "future") return "<td></td>";
+    if (!b.total) return '<td class="dash">–</td>';
+    return '<td class="' + (c.counted.has(i) ? "count" : "") + '" title="' + esc(b.top.map(t => t.player + " " + t.score).join(", ")) + '">' + b.total + "</td>";
+  };
+  const clubRow = (c, posText) => "<tr><td class=\"pos sticky\">" + posText + '</td><td class="left club">' + esc(c.name) + '</td><td class="total">' + c.total + "</td><td>" + c.events + "</td>" +
+    R.map((r, i) => cell(c, i)).join("") + "<td>" + (c.bestRound || "–") + "</td><td>" + (c.bestInd || "–") + "</td></tr>";
+  document.getElementById("clubTable").innerHTML =
+    '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left" scope="col">Club</th><th scope="col">Total</th><th scope="col">Events</th>' + roundHead("R") +
+    '<th scope="col">Best<span class="ev">event total</span></th><th scope="col">Best<span class="ev">individual in that event</span></th></tr></thead><tbody>' +
+    eligible.map(c => clubRow(c, (shared.has(c.pos) ? "T" : "") + c.pos)).join("") +
+    (others.length ? '<tr class="sep"><td colspan="' + (R.length + 6) + '">Not eligible for the trophy (outside Bay of Plenty)</td></tr>' + others.map(c => clubRow(c, '<span class="ne">n/e</span>')).join("") : "") +
+    (eligible.length ? "" : '<tr><td colspan="' + (R.length + 6) + '" class="empty">No results yet. Standings appear after the first event.</td></tr>') +
+    "</tbody>";
+  document.getElementById("clubNote").textContent = "Each event score is the club's best " + S.perClub + " individual scores. Only Bay of Plenty clubs can win the trophy. Hover over an event score to see who counted. The last two columns are the tie-breakers.";
+
+  // ---- players ----
+  const pmap = new Map();
+  for (const x of rows) {
+    const k = x.player + "|" + x.club;
+    if (!pmap.has(k)) pmap.set(k, { player: x.player, club: x.club, scores: Array(R.length).fill(null) });
+    pmap.get(k).scores[x.round - 1] = x.score;
+  }
+  const players = [...pmap.values()].map(p => ({ ...p, total: p.scores.reduce((s, v) => s + (v || 0), 0), events: p.scores.filter(v => v !== null).length }));
+  players.forEach(p => { p.pos = 1 + players.filter(o => o.total > p.total).length; p.cpos = 1 + players.filter(o => o.club === p.club && o.total > p.total).length; });
+  players.sort((a, b) => b.total - a.total || a.player.localeCompare(b.player));
+  const ptie = new Set(players.map(p => p.pos).filter((p, i, a) => a.indexOf(p) !== i));
+  const clubSel = document.getElementById("clubFilter");
+  [...new Set(players.map(p => p.club))].sort().forEach(c => clubSel.insertAdjacentHTML("beforeend", "<option>" + esc(c) + "</option>"));
+  const search = document.getElementById("search");
+  function drawPlayers() {
+    const c = clubSel.value, q = search.value.trim().toLowerCase();
+    const list = players.filter(p => (!c || p.club === c) && (!q || p.player.toLowerCase().includes(q)));
+    document.getElementById("playerTable").innerHTML =
+      '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left" scope="col">Player</th><th scope="col">' + (c ? "Club pos" : "Club pos") + '</th><th scope="col">Total</th><th scope="col">Events</th>' + roundHead("R") + "</tr></thead><tbody>" +
+      (list.length ? list.map(p => '<tr><td class="pos sticky">' + (ptie.has(p.pos) ? "T" : "") + p.pos + '</td><td class="left player"><strong>' + esc(p.player) + "</strong><small>" + esc(p.club) + "</small></td><td>" + p.cpos + '</td><td class="total">' + p.total + "</td><td>" + p.events + "</td>" +
+        p.scores.map((v, i) => R[i].cancelled ? '<td class="cx">CANC.</td>' : v === null ? '<td class="dash">' + (played[i] ? "–" : "") + "</td>" : "<td>" + v + "</td>").join("") + "</tr>").join("")
+        : '<tr><td colspan="' + (R.length + 5) + '" class="empty">No players match. Try another name or club.</td></tr>') + "</tbody>";
+  }
+  clubSel.addEventListener("change", drawPlayers);
+  search.addEventListener("input", drawPlayers);
+  drawPlayers();
+
+  // ---- events ----
+  const pick = document.getElementById("roundPick");
+  R.forEach((r, i) => pick.insertAdjacentHTML("beforeend", '<option value="' + i + '">Round ' + r.n + " – " + esc(r.event) + (r.cancelled ? " (cancelled)" : played[i] ? "" : " (upcoming)") + "</option>"));
+  const lastPlayed = played.lastIndexOf(true);
+  pick.value = String(lastPlayed >= 0 ? lastPlayed : 0);
+  function drawEvent() {
+    const i = +pick.value, r = R[i];
+    document.getElementById("evTitle").textContent = "Round " + r.n + ": " + r.event;
+    document.getElementById("evMeta").textContent = [r.venue, r.date ? new Date(r.date + "T12:00:00").toLocaleDateString("en-NZ", { weekday: "long", day: "numeric", month: "long" }) : "", played[i] ? rows.filter(x => x.round === r.n).length + " players" : ""].filter(Boolean).join(" · ");
+    const srcs = (r.sources || []).map(s => s.link ? '<a href="' + esc(s.link) + '">' + esc(s.label) + "</a>" : esc(s.label));
+    document.getElementById("evSources").innerHTML = srcs.length ? "Results from: " + srcs.join(" · ") : "";
+    const t = document.getElementById("eventTable");
+    if (r.cancelled) { t.innerHTML = '<tbody><tr><td class="empty">This event was cancelled.</td></tr></tbody>'; return; }
+    if (!played[i]) { t.innerHTML = '<tbody><tr><td class="empty">Results will appear here after the event.</td></tr></tbody>'; return; }
+    const list = clubs.map(c => ({ c, b: c.byRound[i] })).filter(x => x.b.total > 0).sort((a, b) => b.b.total - a.b.total || b.b.best - a.b.best);
+    list.forEach(x => { x.pos = 1 + list.filter(o => o.b.total > x.b.total).length; });
+    const et = new Set(list.map(x => x.pos).filter((p, k, a) => a.indexOf(p) !== k));
+    const heads = Array.from({ length: S.perClub }, (_, k) => '<th class="left" scope="col">Counting player ' + (k + 1) + "</th>").join("");
+    t.innerHTML = '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left" scope="col">Club</th><th scope="col">Event score</th><th scope="col">Players</th>' + heads + "</tr></thead><tbody>" +
+      list.map(x => '<tr><td class="pos sticky">' + (et.has(x.pos) ? "T" : "") + x.pos + '</td><td class="left club">' + esc(x.c.name) + '</td><td class="total">' + x.b.total + "</td><td>" + x.b.n + "</td>" +
+        Array.from({ length: S.perClub }, (_, k) => { const p = x.b.top[k]; return '<td class="left">' + (p ? esc(p.player) + ' <strong>' + p.score + "</strong>" : '<span class="dash">–</span>') + "</td>"; }).join("") + "</tr>").join("") + "</tbody>";
+  }
+  pick.addEventListener("change", drawEvent);
+  drawEvent();
+
+  // ---- data check ----
+  const ex = D.excluded || [], wa = D.warnings || [];
+  document.getElementById("checkBody").innerHTML =
+    '<h3 class="note" style="margin:0;padding-bottom:0"><strong>Problems (' + wa.length + ')</strong></h3>' +
+    (wa.length ? "<ul class=\"note\">" + wa.map(w => "<li>" + esc(w) + "</li>").join("") + "</ul>" : '<p class="note">None.</p>') +
+    '<h3 class="note" style="margin:0;padding-bottom:0"><strong>Players not counted because their club isn\'t on the club list (' + ex.length + ')</strong></h3>' +
+    '<p class="note">Usually a visiting player from outside the region. If one should count, add a <em>club</em> line to overrides.csv, or add their club (or its other spelling) to clubs.csv.</p>' +
+    '<div class="scroll"><table><thead><tr><th>Round</th><th class="left">Player</th><th class="left">Club on results</th><th>Points</th><th class="left">Source</th></tr></thead><tbody>' +
+    ex.map(e => "<tr><td>" + e.round + '</td><td class="left">' + esc(e.player) + '</td><td class="left">' + esc(e.club) + "</td><td>" + e.points + '</td><td class="left">' + esc(e.source) + "</td></tr>").join("") + "</tbody></table></div>" +
+    '<h3 class="note" style="margin:0;padding-bottom:0"><strong>Results per source</strong></h3><ul class="note">' +
+    R.map(r => "<li>Round " + r.n + ": " + (r.cancelled ? "cancelled" : (r.sources || []).map(s => esc(s.label) + " – " + s.count + " results").join("; ") || "no sources yet") + "</li>").join("") + "</ul>";
+
+  // ---- routing ----
+  const views = ["clubs", "players", "events", "check"];
+  function route() {
+    const v = views.includes(location.hash.slice(1)) ? location.hash.slice(1) : "clubs";
+    views.forEach(n => { document.getElementById("view-" + n).hidden = n !== v; });
+    document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.view === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  }
+  window.addEventListener("hashchange", route);
+  route();
+}
+</script>
+</body>
+</html>
