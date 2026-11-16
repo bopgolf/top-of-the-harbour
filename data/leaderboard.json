@@ -11,33 +11,33 @@
   {
    "season": "2025",
    "winner": "Taupo Golf Club",
-   "runner_up": "",
-   "third": "",
-   "top_individual": "",
+   "runner_up": "Futures Geyserland",
+   "third": "Mount Maunganui Golf Club",
+   "top_individual": "Jackson Manihera",
    "note": ""
   },
   {
    "season": "2024",
    "winner": "Taupo Golf Club",
-   "runner_up": "",
-   "third": "",
-   "top_individual": "",
+   "runner_up": "Tauranga Golf Club",
+   "third": "Futures Geyserland",
+   "top_individual": "Noël Kim",
    "note": ""
   },
   {
    "season": "2023",
    "winner": "Taupo Golf Club",
-   "runner_up": "",
-   "third": "",
-   "top_individual": "",
+   "runner_up": "Opotiki Golf Club",
+   "third": "Tauranga Golf Club",
+   "top_individual": "Fynn Campbell",
    "note": ""
   },
   {
    "season": "2022",
    "winner": "Tauranga Golf Club",
-   "runner_up": "",
-   "third": "",
-   "top_individual": "",
+   "runner_up": "Omanu Golf Club",
+   "third": "Mount Maunganui Golf Club",
+   "top_individual": "Elijah Ellis",
    "note": ""
   },
   {
@@ -5076,6 +5076,6 @@
   }
  ],
  "warnings": [],
- "digest": "5b65cd4c288a31eff9c8019aed15cbc6c842e162868b97f8ab9b7e6d13b57444",
- "updated": "2026-11-16T01:07+00:00"
+ "digest": "20b02385c1e458559f7420616090b5acda2986247d8ca2c3aa3f3cad9fd40c67",
+ "updated": "2026-11-16T01:12+00:00"
 }
