@@ -189,7 +189,7 @@
  "clubs": [
   {
    "name": "Fairview Golf Club",
-   "bop": true,
+   "bop": false,
    "logo": "logos/fairview-golf-club.png"
   },
   {
@@ -4753,6 +4753,6 @@
   }
  ],
  "warnings": [],
- "digest": "75545ad0caeb4baac818e0d8531b3fe4ccc52df3ba28b047673c16a751d7e7c5",
- "updated": "2026-11-16T00:30+00:00"
+ "digest": "1d5978a23dc1b557a68c7d91b49b9fc63b9ce93f1a6f7f28d7101c82eea1c967",
+ "updated": "2026-11-16T00:36+00:00"
 }
