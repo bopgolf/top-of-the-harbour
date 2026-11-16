@@ -141,7 +141,13 @@
   "logo": "logos/brand-logo.png",
   "eyebrow": "Top of the Harbour Tour | Bay of Plenty Futures Opens"
  },
- "sponsors": [],
+ "sponsors": [
+  {
+   "name": "Bay of Plenty Eagles",
+   "logo": "logos/sponsor-bay-of-plenty-eagles.png",
+   "link": ""
+  }
+ ],
  "settings": {
   "perClub": 3,
   "bestEvents": 6,
@@ -5070,6 +5076,6 @@
   }
  ],
  "warnings": [],
- "digest": "bc5b69037886b870af54e35634cb1c942beb970ed7bc2724eada4682953b06ec",
- "updated": "2026-11-16T01:06+00:00"
+ "digest": "5b65cd4c288a31eff9c8019aed15cbc6c842e162868b97f8ab9b7e6d13b57444",
+ "updated": "2026-11-16T01:07+00:00"
 }
