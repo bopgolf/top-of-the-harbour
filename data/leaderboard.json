@@ -141,7 +141,8 @@
  ],
  "brand": {
   "logo": "logos/brand-logo.png",
-  "eyebrow": "Top of the Harbour Tour | Bay of Plenty Futures Opens"
+  "eyebrow": "Top of the Harbour Tour | Bay of Plenty Futures Opens",
+  "intro": ""
  },
  "sponsors": [
   {
@@ -341,6 +342,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "7a65a0b38ce09ca39c85913b5664fbd0a54b9f252fb3e9cbf650a95970678f0c",
- "updated": "2026-11-16T19:28+00:00"
+ "digest": "363bfd3c3a7a21014b4ccfe39e3906c1993bb6b8d4ed4a02a7eeb22ed2b9d1ee",
+ "updated": "2026-11-16T19:30+00:00"
 }
