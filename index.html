@@ -109,10 +109,26 @@ select, input[type="search"] { font: inherit; font-size: 15px; padding: 7px 10px
 .empty { padding: 28px 16px; text-align: center; color: var(--muted); }
 .pill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: var(--count-bg); color: var(--count-ink); }
 footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
+.brandrow { display: flex; align-items: center; gap: 18px; }
+.brandlogo { height: 84px; width: auto; max-width: 180px; object-fit: contain; flex: 0 0 auto; }
+.sponsors { background: var(--board); border-bottom: 1px solid var(--line); }
+.sponsors .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 34px; padding: 12px 16px; }
+.sponsors .lbl { font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.sponsors a, .sponsors span.sp { display: inline-flex; align-items: center; text-decoration: none; color: var(--ink); font-weight: 600; }
+.sponsors img { height: 44px; width: auto; max-width: 160px; object-fit: contain; }
+.banner { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; background: var(--count-bg); border: 1px solid var(--accent); border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; font-weight: 600; }
+.honours td { vertical-align: middle; }
+.honours .yr { font: 700 22px var(--display); width: 70px; }
+.titles { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.titles .t { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 4px 4px; font-size: 14px; }
+.titles .t b { font: 700 18px var(--display); color: var(--figure); }
+.mini { display: inline-flex; align-items: center; gap: 8px; text-align: left; white-space: normal; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   .podium { grid-template-columns: 1fr; }
   .pod .crest .logo { width: 64px; height: 64px; font-size: 20px; }
+  .brandlogo { height: 56px; max-width: 110px; }
+  .sponsors img { height: 32px; }
   .crestcell { flex-direction: column; gap: 4px; min-width: 96px; text-align: center; }
   .crestcell .logo { width: 46px; height: 46px; font-size: 15px; }
   .crestcell .cname { font-size: 11.5px; max-width: 96px; }
@@ -127,20 +143,28 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
 <body>
 <header class="band">
   <div class="wrap">
-    <div class="eyebrow">Bay of Plenty Golf · Futures Series</div>
-    <h1 id="title">Top of the Harbour</h1>
+    <div class="brandrow">
+      <img class="brandlogo" id="brandLogo" alt="" hidden>
+      <div>
+        <div class="eyebrow" id="eyebrow">Bay of Plenty Golf · Futures Series</div>
+        <h1 id="title">Top of the Harbour</h1>
+      </div>
+    </div>
     <p class="sub" id="subtitle">Clubs compete as teams across the junior and Futures opens. The best three stableford scores from each club count at every event, and each club's best six events make up its season total.</p>
     <div class="meta" id="meta"></div>
     <nav class="tabs" aria-label="Leaderboard views">
       <a href="#clubs" data-view="clubs">Club teams</a>
       <a href="#players" data-view="players">Individuals</a>
       <a href="#events" data-view="events">Event results</a>
+      <a href="#history" data-view="history">History</a>
     </nav>
   </div>
 </header>
+<div class="sponsors" id="sponsors" hidden><div class="wrap" id="sponsorList"></div></div>
 
 <div class="wrap">
 <main>
+  <div class="banner" id="pastBanner" hidden></div>
   <section id="view-clubs">
     <div class="podium" id="podium"></div>
     <div class="panel">
@@ -189,6 +213,15 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
     </div>
   </section>
 
+  <section id="view-history" hidden>
+    <div class="panel">
+      <div class="panel-head"><h2>Honours board</h2><span class="legend" id="histNote"></span></div>
+      <div class="titles" id="titles"></div>
+      <div class="scroll"><table class="honours" id="histTable"><tbody><tr><td class="empty">Loading…</td></tr></tbody></table></div>
+      <p class="note">Seasons with a <strong>Full leaderboard</strong> link were kept on this site and can be viewed exactly as they finished.</p>
+    </div>
+  </section>
+
   <section id="view-check" hidden>
     <div class="panel">
       <div class="panel-head"><h2>Data check</h2><a href="#clubs">Back to the leaderboard</a></div>
@@ -201,29 +234,19 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
 </div>
 
 <script>
-fetch("data/leaderboard.json", { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(render).catch(err => {
+const want = new URLSearchParams(location.search).get("season");
+const getJSON = u => fetch(u, { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+getJSON("data/leaderboard.json").then(CUR => {
+  if (want && String(want) !== String(CUR.season) && (CUR.archive || []).map(String).includes(String(want)))
+    return getJSON("data/seasons/" + encodeURIComponent(want) + ".json").then(D => render(D, CUR));
+  render(CUR, CUR);
+}).catch(err => {
   document.querySelector("main").innerHTML = '<div class="panel"><p class="empty">The leaderboard data could not be loaded (' + err.message + '). Try refreshing the page.</p></div>';
 });
-function render(D) {
-  const S = D.settings;
-  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const R = D.rounds;
-  const title = D.season + " " + (D.title || "Top of the Harbour");
-
-  // ---- colours chosen on the organiser page
-  const th = D.theme || {}, root = document.documentElement.style;
-  if (th.header) {
-    root.setProperty("--brand", th.header);
-    const n = parseInt(th.header.slice(1), 16), lum = (0.2126 * (n >> 16 & 255) + 0.7152 * (n >> 8 & 255) + 0.0722 * (n & 255)) / 255;
-    root.setProperty("--on-brand", lum > 0.6 ? "#14181a" : "#ffffff");
-  }
-  if (th.accent) root.setProperty("--accent", th.accent);
-
-  // ---- clubs and logos
+// ---- scoring: shared by the leaderboard and the history tab
+function compute(D) {
+  const S = D.settings, R = D.rounds;
   const clubInfo = new Map(D.clubs.map(c => [c.name, c]));
-  const initials = name => name.replace(/\b(golf|club|links|gc)\b/gi, "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
-  const logo = (club, cls) => { const c = clubInfo.get(club); return c && c.logo ? '<img class="logo ' + (cls || "") + '" src="' + esc(c.logo) + '" alt="" loading="lazy">' : '<span class="logo ' + (cls || "") + '" aria-hidden="true">' + esc(initials(club)) + "</span>"; };
-
   // ---- clean results
   const seen = new Set(), rows = [];
   for (const [round, player, club, holes, pts] of D.results) {
@@ -256,12 +279,64 @@ function render(D) {
   const shared = new Set(eligible.map(c => c.pos).filter((p, i, a) => a.indexOf(p) !== i));
   const others = clubs.filter(c => !c.bop).sort(cmp);
 
+  const pmap = new Map();
+  for (const x of rows) {
+    const k = x.player + "|" + x.club;
+    if (!pmap.has(k)) pmap.set(k, { player: x.player, club: x.club, scores: Array(R.length).fill(null) });
+    pmap.get(k).scores[R.findIndex(r => r.n === x.round)] = x.score;
+  }
+  const players = [...pmap.values()].map(p => ({ ...p, total: p.scores.reduce((s, v) => s + (v || 0), 0), events: p.scores.filter(v => v !== null).length }));
+  players.forEach(p => { p.pos = 1 + players.filter(o => o.total > p.total).length; p.cpos = 1 + players.filter(o => o.club === p.club && o.total > p.total).length; });
+  players.sort((a, b) => b.total - a.total || a.player.localeCompare(b.player));
+  const ptie = new Set(players.map(p => p.pos).filter((p, i, a) => a.indexOf(p) !== i));
+  return { rows, played, clubs, eligible, shared, others, players, ptie };
+}
+function render(D, CUR) {
+  const S = D.settings;
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const R = D.rounds;
+  const title = D.season + " " + (D.title || "Top of the Harbour");
+
+  // ---- colours chosen on the organiser page
+  const th = CUR.theme || {}, root = document.documentElement.style;
+  if (th.header) {
+    root.setProperty("--brand", th.header);
+    const n = parseInt(th.header.slice(1), 16), lum = (0.2126 * (n >> 16 & 255) + 0.7152 * (n >> 8 & 255) + 0.0722 * (n & 255)) / 255;
+    root.setProperty("--on-brand", lum > 0.6 ? "#14181a" : "#ffffff");
+  }
+  if (th.accent) root.setProperty("--accent", th.accent);
+
+  // ---- clubs and logos (current club list first, so logos added later also show on past seasons)
+  const clubInfo = new Map([...D.clubs, ...CUR.clubs].map(c => [c.name, c]));
+  const { rows, played, clubs, eligible, shared, others, players, ptie } = compute(D);
+  const initials = name => name.replace(/\b(golf|club|links|gc)\b/gi, "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
+  const logo = (club, cls) => { const c = clubInfo.get(club); return c && c.logo ? '<img class="logo ' + (cls || "") + '" src="' + esc(c.logo) + '" alt="" loading="lazy">' : '<span class="logo ' + (cls || "") + '" aria-hidden="true">' + esc(initials(club)) + "</span>"; };
+
+  // ---- branding and sponsors (always from the current season)
+  const B = CUR.brand || {};
+  if (B.logo) { const im = document.getElementById("brandLogo"); im.src = B.logo; im.alt = ""; im.hidden = false; }
+  if (B.eyebrow) document.getElementById("eyebrow").textContent = B.eyebrow;
+  const sps = CUR.sponsors || [];
+  if (sps.length) {
+    document.getElementById("sponsorList").innerHTML = '<span class="lbl">Supported by</span>' + sps.map(x => {
+      const inner = x.logo ? '<img src="' + esc(x.logo) + '" alt="' + esc(x.name) + '" title="' + esc(x.name) + '">' : esc(x.name);
+      return x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">' + inner + "</a>" : '<span class="sp">' + inner + "</span>";
+    }).join("");
+    document.getElementById("sponsors").hidden = false;
+  }
+  const isPast = String(D.season) !== String(CUR.season);
+  if (isPast) {
+    const pb = document.getElementById("pastBanner");
+    pb.innerHTML = "<span>You're viewing the " + esc(D.season) + " season" + (D.status === "Final" ? " (final standings)" : "") + '.</span><a class="btn" href="./">Back to ' + esc(CUR.season) + "</a>";
+    pb.hidden = false;
+  }
+
   // ---- header
   document.title = title + " Leaderboard";
   document.getElementById("title").textContent = title;
   const lastRound = Math.max(0, ...R.filter((r, i) => played[i]).map(r => r.n));
   document.getElementById("meta").innerHTML =
-    (D.status === "Final" ? '<span class="chip final">Final standings</span>' : '<span class="chip">After round ' + lastRound + "</span>") +
+    (D.status === "Final" ? '<span class="chip final">Final standings</span>' : lastRound ? '<span class="chip">After round ' + lastRound + "</span>" : '<span class="chip">Season starts soon</span>') +
     '<span class="chip">' + played.filter(Boolean).length + " of " + R.filter(r => !r.cancelled).length + " events played</span>" +
     '<span class="chip">' + new Set(rows.map(r => r.player + "|" + r.club)).size + " players</span>" +
     (D.updated ? '<span class="chip">Updated ' + new Date(D.updated).toLocaleString("en-NZ", { timeZone: "Pacific/Auckland", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" }) + "</span>" : "");
@@ -295,16 +370,6 @@ function render(D) {
   document.getElementById("clubNote").textContent = "Each event score is the club's best " + S.perClub + " individual scores. Hover over a score to see who counted, or open Event results. Only Bay of Plenty clubs can win the trophy.";
 
   // ---- players
-  const pmap = new Map();
-  for (const x of rows) {
-    const k = x.player + "|" + x.club;
-    if (!pmap.has(k)) pmap.set(k, { player: x.player, club: x.club, scores: Array(R.length).fill(null) });
-    pmap.get(k).scores[R.findIndex(r => r.n === x.round)] = x.score;
-  }
-  const players = [...pmap.values()].map(p => ({ ...p, total: p.scores.reduce((s, v) => s + (v || 0), 0), events: p.scores.filter(v => v !== null).length }));
-  players.forEach(p => { p.pos = 1 + players.filter(o => o.total > p.total).length; p.cpos = 1 + players.filter(o => o.club === p.club && o.total > p.total).length; });
-  players.sort((a, b) => b.total - a.total || a.player.localeCompare(b.player));
-  const ptie = new Set(players.map(p => p.pos).filter((p, i, a) => a.indexOf(p) !== i));
   const clubSel = document.getElementById("clubFilter");
   [...new Set(players.map(p => p.club))].sort().forEach(c => clubSel.insertAdjacentHTML("beforeend", "<option>" + esc(c) + "</option>"));
   const search = document.getElementById("search");
@@ -369,11 +434,36 @@ function render(D) {
     '<p class="note"><strong>Results per source</strong></p><ul class="note">' +
     R.map(r => "<li>Round " + r.n + ": " + (r.cancelled ? "cancelled" : (r.sources || []).map(s => esc(s.label) + " – " + s.count + " results").join("; ") || "no sources yet") + "</li>").join("") + "</ul>";
 
+  // ---- history
+  let historyDone = false;
+  async function drawHistory() {
+    if (historyDone) return; historyDone = true;
+    const years = new Map();
+    for (const h of CUR.honours || []) years.set(String(h.season), { season: +h.season, winner: h.winner, second: h.runner_up, third: h.third, ind: h.top_individual, note: h.note });
+    const summarise = (S2, link) => {
+      const c = compute(S2); const e = c.eligible;
+      const top = c.players.filter(p => p.pos === 1).map(p => p.player + " (" + p.club + ")").join(" & ");
+      return { season: +S2.season, winner: e[0] && e[0].name, wpts: e[0] && e[0].total, second: e[1] && e[1].name, third: e[2] && e[2].name, ind: top, ipts: c.players[0] && c.players[0].total, link, live: S2.status !== "Final" };
+    };
+    const loads = (CUR.archive || []).map(y => getJSON("data/seasons/" + y + ".json").then(S2 => years.set(String(y), summarise(S2, "?season=" + y + "#clubs"))).catch(() => {}));
+    await Promise.all(loads);
+    if (!years.has(String(CUR.season)) && CUR.status === "Final") years.set(String(CUR.season), summarise(CUR, "./#clubs"));
+    const list = [...years.values()].filter(y => y.winner).sort((a, b) => b.season - a.season);
+    const count = {}; list.forEach(y => (count[y.winner] = (count[y.winner] || 0) + 1));
+    document.getElementById("titles").innerHTML = Object.entries(count).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([c, n]) => '<span class="t">' + logo(c, "sm") + "<span>" + esc(c) + "</span><b>" + n + "</b></span>").join("");
+    document.getElementById("histNote").textContent = list.length ? "Trophy winners since " + list[list.length - 1].season : "";
+    const club = (n, pts) => n ? '<span class="mini">' + logo(n, "sm") + "<span>" + esc(n) + (pts ? ' <span class="muted">' + pts + "</span>" : "") + "</span></span>" : '<span class="dash">–</span>';
+    document.getElementById("histTable").innerHTML = '<thead><tr><th scope="col">Year</th><th class="left" scope="col">Winner</th><th class="left" scope="col">2nd</th><th class="left" scope="col">3rd</th><th class="left" scope="col">Top individual</th><th></th></tr></thead><tbody>' +
+      (list.length ? list.map(y => '<tr><td class="yr">' + y.season + '</td><td class="left"><span class="crestcell">' + logo(y.winner) + '<span class="cname">' + esc(y.winner) + (y.wpts ? "<br><span class=\"muted\">" + y.wpts + " pts</span>" : "") + '</span></span></td><td class="left">' + club(y.second) + '</td><td class="left">' + club(y.third) + '</td><td class="left" style="white-space:normal">' + (y.ind ? esc(y.ind) + (y.ipts ? ' <span class="muted">' + y.ipts + "</span>" : "") : '<span class="dash">–</span>') + (y.note ? '<br><small class="muted">' + esc(y.note) + "</small>" : "") + "</td><td>" + (y.link ? '<a class="btn ghost" href="' + esc(y.link) + '">Full leaderboard</a>' : "") + "</td></tr>").join("")
+        : '<tr><td class="empty">No past seasons yet.</td></tr>') + "</tbody>";
+  }
+
   // ---- routing
-  const views = ["clubs", "players", "events", "check"];
+  const views = ["clubs", "players", "events", "history", "check"];
   function route() {
     const v = views.includes(location.hash.slice(1)) ? location.hash.slice(1) : "clubs";
     views.forEach(n => { document.getElementById("view-" + n).hidden = n !== v; });
+    if (v === "history") drawHistory();
     document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.view === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   }
   window.addEventListener("hashchange", route);

@@ -36,6 +36,28 @@ To show the leaderboard inside a page on your existing website, paste this where
 
 ---
 
+## The organiser page (easiest way to make changes)
+
+Go to your leaderboard link and add `admin.html` to the end, e.g.
+`https://YOUR-GITHUB-NAME.github.io/top-of-the-harbour/admin.html`. There's also an **Organiser** link
+at the bottom of the leaderboard. From there you can add results links, fix scores, upload results, edit clubs and settings, and
+press **Update the leaderboard now**.
+
+The first time, you'll need a GitHub **access key** (the page shows you how): open
+github.com/settings/personal-access-tokens/new, choose *Only select repositories* → this project,
+set **Contents** and **Actions** to **Read and write**, and generate it. Paste it into the organiser page.
+Keep it private: anyone with the key can change the leaderboard. When it expires, make a new one.
+
+Everything the organiser page does can also be done by editing the files directly, as below.
+
+### Look, sponsors and history
+
+* **Look & sponsors** tab: upload your own logo for the header, change the small heading, and add sponsors
+  (logo, name and website link). Sponsors show in a *Supported by* strip under the header.
+* **History** tab: at the end of a season, set Status to Final, click **Save season to History**, then
+  **Start next season**. Saved seasons appear on the leaderboard's **History** tab with a link to their full
+  leaderboard. Winners from before this website are kept under *Past winners* (`honours.csv`).
+
 ## The files you edit
 
 You can edit any of these straight on GitHub: open the file, click the **pencil** icon, make the
