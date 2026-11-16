@@ -6,6 +6,142 @@
   "header": "#0011ff",
   "accent": "#00ff04"
  },
+ "archive": [],
+ "honours": [
+  {
+   "season": "2025",
+   "winner": "Taupo Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2024",
+   "winner": "Taupo Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2023",
+   "winner": "Taupo Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2022",
+   "winner": "Tauranga Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2021",
+   "winner": "Omokoroa Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2020",
+   "winner": "Omanu Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2019",
+   "winner": "Omanu Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2018",
+   "winner": "Omokoroa Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2017",
+   "winner": "Otumoetai Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2016",
+   "winner": "Otumoetai Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2015",
+   "winner": "Tauranga Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2014",
+   "winner": "Tauranga Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2013",
+   "winner": "Tauranga Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2012",
+   "winner": "Omanu Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2011",
+   "winner": "Tauranga Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  },
+  {
+   "season": "2010",
+   "winner": "Otumoetai Golf Club",
+   "runner_up": "",
+   "third": "",
+   "top_individual": "",
+   "note": ""
+  }
+ ],
+ "brand": {
+  "logo": "",
+  "eyebrow": "Bay of Plenty Golf · Futures Series"
+ },
+ "sponsors": [],
  "settings": {
   "perClub": 3,
   "bestEvents": 6,
@@ -4753,6 +4889,6 @@
   }
  ],
  "warnings": [],
- "digest": "1d5978a23dc1b557a68c7d91b49b9fc63b9ce93f1a6f7f28d7101c82eea1c967",
- "updated": "2026-11-16T00:36+00:00"
+ "digest": "aca446e9d866d09c56cd34b2e8a18a5574e7001c3a52dbfefce2831182597995",
+ "updated": "2026-11-16T00:47+00:00"
 }
