@@ -161,7 +161,7 @@
    "event": "Taupō Futures Open",
    "short": "Taupō Futures Open",
    "venue": "Taupo GC",
-   "date": "",
+   "date": "2027-02-21",
    "cancelled": false,
    "sources": []
   },
@@ -170,7 +170,7 @@
    "event": "The Clubroom Tauranga Futures Open",
    "short": "The Clubroom Tauranga Futures Open",
    "venue": "Tauranga GC",
-   "date": "",
+   "date": "2027-03-14",
    "cancelled": false,
    "sources": []
   },
@@ -179,7 +179,7 @@
    "event": "Ōpōtiki Futures Open",
    "short": "Ōpōtiki Futures Open",
    "venue": "Opotiki GC",
-   "date": "",
+   "date": "2027-05-16",
    "cancelled": false,
    "sources": []
   },
@@ -188,7 +188,7 @@
    "event": "Futures Geyserland Open",
    "short": "Futures Geyserland Open",
    "venue": "Lake View GC",
-   "date": "",
+   "date": "2027-06-13",
    "cancelled": false,
    "sources": []
   },
@@ -197,7 +197,7 @@
    "event": "Whakatāne Futures Open",
    "short": "Whakatāne Futures Open",
    "venue": "Whakatane GC",
-   "date": "",
+   "date": "2027-04-18",
    "cancelled": false,
    "sources": []
   },
@@ -206,7 +206,7 @@
    "event": "Mount Junior Open",
    "short": "Mount Junior Open",
    "venue": "Mount GC",
-   "date": "",
+   "date": "2027-07-25",
    "cancelled": false,
    "sources": []
   },
@@ -215,7 +215,7 @@
    "event": "Rotorua Futures Open",
    "short": "Rotorua Futures Open",
    "venue": "Rotorua GC",
-   "date": "",
+   "date": "2027-08-22",
    "cancelled": false,
    "sources": []
   },
@@ -224,7 +224,7 @@
    "event": "Fore Seasons Futures Open",
    "short": "Fore Seasons Futures Open",
    "venue": "Fore Seasons Indoor Golf",
-   "date": "",
+   "date": "2027-09-19",
    "cancelled": false,
    "sources": []
   },
@@ -233,7 +233,7 @@
    "event": "Ōmokoroa Junior Open",
    "short": "Ōmokoroa Junior Open",
    "venue": "Omokoroa GC",
-   "date": "",
+   "date": "2027-11-14",
    "cancelled": false,
    "sources": []
   },
@@ -242,7 +242,7 @@
    "event": "Omanu Futures Open",
    "short": "Omanu Futures Open",
    "venue": "Omanu GC",
-   "date": "",
+   "date": "2027-10-31",
    "cancelled": false,
    "sources": []
   }
@@ -332,6 +332,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "ca658fc6c7f7cb7945fcf74b103f4c23f248133ab1d49564d6377d164c0f14e1",
- "updated": "2026-11-16T02:08+00:00"
+ "digest": "b5fb1f6fdb6525c7d08708dc9d3f89a415916d041b5ea16c105b75627f7aed25",
+ "updated": "2026-11-16T02:10+00:00"
 }
