@@ -5,7 +5,7 @@ status,Live,"Live during the season, Final once the last event is done"
 scores_per_club,3,Best individual scores that count for each club at each event
 best_events,6,Best event totals that count toward each club's season total
 nine_hole_add,17,Points added to a 9-hole stableford score (WHS)
-colour_header,#000657,
+colour_header,#2a2e5a,
 colour_accent,#00ff04,
 eyebrow,Top of the Harbour Tour | Bay of Plenty Futures Opens,
 header_logo,logos/brand-logo.png,
