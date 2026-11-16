@@ -4888,7 +4888,9 @@
    "source": "Omanu Futures Open - 9 Holes"
   }
  ],
- "warnings": [],
- "digest": "aca446e9d866d09c56cd34b2e8a18a5574e7001c3a52dbfefce2831182597995",
- "updated": "2026-11-16T00:47+00:00"
+ "warnings": [
+  "Round 8: could not read source https://www.golfgenius.com/pages/13064375720422177907 ('list' object has no attribute 'strip')."
+ ],
+ "digest": "8a641b685beed9b3e9da7a43856989c77e6275671bc590358bc28b01f798ae55",
+ "updated": "2026-11-16T00:48+00:00"
 }
