@@ -6,7 +6,9 @@
   "header": "#000ba3",
   "accent": "#00ff04"
  },
- "archive": [],
+ "archive": [
+  2026
+ ],
  "honours": [
   {
    "season": "2025",
@@ -5076,6 +5078,6 @@
   }
  ],
  "warnings": [],
- "digest": "26f23ed2be010babeee357cc88d44fb344201c172a75c3f962bd00c8887b55a0",
- "updated": "2026-11-16T02:06+00:00"
+ "digest": "b5eab391d1668349ce3d8dad0b90c28a14b5b716a3a58f9ffa74f190b3744ac2",
+ "updated": "2026-11-16T02:07+00:00"
 }
