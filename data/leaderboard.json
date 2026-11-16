@@ -15,7 +15,7 @@
   {
    "n": 1,
    "event": "Taupō Futures Open",
-   "short": "Taupo",
+   "short": "Taupō Futures Open",
    "venue": "Taupo GC",
    "date": "2026-02-22",
    "cancelled": false,
@@ -35,7 +35,7 @@
   {
    "n": 2,
    "event": "The Clubroom Tauranga Futures Open",
-   "short": "Tauranga",
+   "short": "The Clubroom Tauranga Futures Open",
    "venue": "Tauranga GC",
    "date": "2026-03-08",
    "cancelled": false,
@@ -55,7 +55,7 @@
   {
    "n": 3,
    "event": "Ōpōtiki Futures Open",
-   "short": "Opotiki",
+   "short": "Ōpōtiki Futures Open",
    "venue": "Opotiki GC",
    "date": "2026-05-24",
    "cancelled": false,
@@ -75,7 +75,7 @@
   {
    "n": 4,
    "event": "Futures Geyserland Open",
-   "short": "Lake View",
+   "short": "Futures Geyserland Open",
    "venue": "Lake View GC",
    "date": "2026-06-07",
    "cancelled": false,
@@ -95,7 +95,7 @@
   {
    "n": 5,
    "event": "Whakatāne Futures Open",
-   "short": "Whakatane",
+   "short": "Whakatāne Futures Open",
    "venue": "Whakatane GC",
    "date": "2026-04-19",
    "cancelled": true,
@@ -104,7 +104,7 @@
   {
    "n": 6,
    "event": "Mount Junior Open",
-   "short": "Mount",
+   "short": "Mount Junior Open",
    "venue": "Mount GC",
    "date": "2026-07-26",
    "cancelled": false,
@@ -119,7 +119,7 @@
   {
    "n": 7,
    "event": "Rotorua Futures Open",
-   "short": "Rotorua",
+   "short": "Rotorua Futures Open",
    "venue": "Rotorua GC",
    "date": "2026-08-16",
    "cancelled": false,
@@ -139,7 +139,7 @@
   {
    "n": 8,
    "event": "Fore Seasons Futures Open",
-   "short": "Fore Seasons",
+   "short": "Fore Seasons Futures Open",
    "venue": "Fore Seasons Indoor Golf",
    "date": "2026-09-20",
    "cancelled": false,
@@ -148,7 +148,7 @@
   {
    "n": 9,
    "event": "Ōmokoroa Junior Open",
-   "short": "Omokoroa",
+   "short": "Ōmokoroa Junior Open",
    "venue": "Omokoroa GC",
    "date": "2026-10-18",
    "cancelled": false,
@@ -168,7 +168,7 @@
   {
    "n": 10,
    "event": "Omanu Futures Open",
-   "short": "Omanu",
+   "short": "Omanu Futures Open",
    "venue": "Omanu GC",
    "date": "2026-11-01",
    "cancelled": false,
@@ -4753,6 +4753,6 @@
   }
  ],
  "warnings": [],
- "digest": "8bc1f3b7e5581acdbda6bfdd83e553099815d0450c719f29e15f34ee5c40feb4",
- "updated": "2026-11-16T00:28+00:00"
+ "digest": "75545ad0caeb4baac818e0d8531b3fe4ccc52df3ba28b047673c16a751d7e7c5",
+ "updated": "2026-11-16T00:30+00:00"
 }
