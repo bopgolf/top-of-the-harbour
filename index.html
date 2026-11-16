@@ -267,7 +267,8 @@ function compute(D) {
       return { kind: "num", total: top.reduce((s, x) => s + x.score, 0), top, n: mine.length, best: mine.length ? mine[0].score : 0 };
     });
     const nums = byRound.map((b, i) => ({ i, v: b.kind === "num" ? b.total : 0 })).filter(x => x.v > 0);
-    const counted = new Set([...nums].sort((a, b) => b.v - a.v || a.i - b.i).slice(0, S.bestEvents).map(x => x.i));
+    const always = nums.filter(x => R[x.i].always), rest = nums.filter(x => !R[x.i].always);
+    const counted = new Set([...always.map(x => x.i), ...rest.sort((a, b) => b.v - a.v || a.i - b.i).slice(0, S.bestEvents).map(x => x.i)]);
     const total = [...counted].reduce((s, i) => s + byRound[i].total, 0);
     const bestRound = nums.length ? Math.max(...nums.map(x => x.v)) : 0;
     const bestInd = nums.filter(x => x.v === bestRound).reduce((m, x) => Math.max(m, byRound[x.i].best), 0);
@@ -328,7 +329,7 @@ function render(D, CUR) {
   const isPast = String(D.season) !== String(CUR.season);
   if (isPast) {
     const pb = document.getElementById("pastBanner");
-    pb.innerHTML = "<span>You're viewing the " + esc(D.season) + " season" + (D.status === "Final" ? " (final standings)" : "") + '.</span><a class="btn" href="./">Back to ' + esc(CUR.season) + "</a>";
+    pb.innerHTML = "<span>You're viewing the " + esc(D.season) + " season" + (D.status === "Final" ? " (final standings)" : "") + "." + (D.note ? '<br><span style="font-weight:400;font-size:14px">' + esc(D.note) + "</span>" : "") + '</span><a class="btn" href="./">Back to ' + esc(CUR.season) + "</a>";
     pb.hidden = false;
   }
 
@@ -341,7 +342,8 @@ function render(D, CUR) {
     '<span class="chip">' + played.filter(Boolean).length + " of " + R.filter(r => !r.cancelled).length + " events played</span>" +
     '<span class="chip">' + new Set(rows.map(r => r.player + "|" + r.club)).size + " players</span>" +
     (D.updated ? '<span class="chip">Updated ' + new Date(D.updated).toLocaleString("en-NZ", { timeZone: "Pacific/Auckland", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" }) + "</span>" : "");
-  document.getElementById("countLegend").textContent = "Counts toward total (best " + S.bestEvents + " events)";
+  const alw = R.filter(r => r.always && !r.cancelled).map(r => r.short || r.event);
+  document.getElementById("countLegend").textContent = "Counts toward total (best " + S.bestEvents + " events" + (alw.length ? " + " + alw.join(" + ") : "") + ")";
   document.getElementById("footer").innerHTML = esc(title + " · Ties are decided by best single-event club total, then by the best individual score in that event. If still tied, positions are shared.") + ' <a href="#check">Data check</a> · <a href="admin.html">Organiser</a>';
   const fmtDate = (iso, opts) => iso ? new Date(iso + "T12:00:00").toLocaleDateString("en-NZ", opts || { day: "numeric", month: "short" }) : "";
   const roundHead = () => R.map(r => '<th class="rd" scope="col" title="' + esc("Round " + r.n + ": " + r.event + (r.date ? ", " + fmtDate(r.date, { day: "numeric", month: "long" }) : "")) + '">R' + r.n + "<span>" + esc(r.short) + "</span></th>").join("");
