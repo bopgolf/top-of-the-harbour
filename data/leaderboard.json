@@ -321,7 +321,7 @@
   {
    "name": "Te Puke Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/te-puke-golf-club.png"
   },
   {
    "name": "Turangi Golf Club",
@@ -342,6 +342,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "24df2f264c2557e95991e470ecd9c775d27667e8968ee25681a08dd7b707ce66",
- "updated": "2026-11-16T19:33+00:00"
+ "digest": "1ece7835f45433f429ef7b56ed5c9f8b9aaad40d35c1eb275a82adfe10661afc",
+ "updated": "2026-11-16T19:35+00:00"
 }
