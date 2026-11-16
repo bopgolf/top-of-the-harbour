@@ -1,10 +1,10 @@
 action,round,player,club,holes,points,new_value,note
 # HOW TO USE: one fix per line. Actions: add / score / remove / club / rename. Lines starting with # are ignored.,,,,,,,
-# add    - add a result Golf NZ doesn't have: fill round, player, club, holes (18 or 9) and points (raw stableford),,,,,,,
-# score  - change a player's points for a round: fill round, player, points (and holes if that changed),,,,,,,
-# remove - take a result out: fill player, and round (leave round blank to remove the player from every round),,,,,,,
+# add    - add a result Golf NZ doesn't have: fill round," player"," club"," holes (18 or 9) and points (raw stableford)",,,,,,,
+# score  - change a player's points for a round: fill round," player"," points (and holes if that changed)",,,,,,,
+# remove - take a result out: fill player," and round (leave round blank to remove the player from every round)",,,,,,,
 # club   - count a player for a different home club: fill player and club (round blank = every round),,,,,,,
-# rename - merge two spellings of a name: player = spelling to replace, new_value = spelling to keep,,,,,,,
+# rename - merge two spellings of a name: player = spelling to replace," new_value = spelling to keep",,,,,,,
 #,,,,,,,
 # 2026: these make the site match the official 2026 standings (the manual spreadsheet),,,,,,,
 rename,,"Hudson, Ngahiramai",,,,"Hudson, Ngahirami",Spelling used on the 2026 sheet
@@ -27,3 +27,4 @@ score,10,"Davies, Tysen",,,32,,Golf NZ has 34
 score,2,"Smith, Eli",,,31,,Golf NZ has 29
 score,7,"Cartwright, Matthew",,,25,,Golf NZ has 24
 remove,2,"Leach, Mason",,,,,Golf NZ has 35 but not on the 2026 sheet
+club,8,"Bowater, Casey",Futures Geyserland,,,,
