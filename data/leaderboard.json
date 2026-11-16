@@ -176,6 +176,15 @@
   },
   {
    "n": 3,
+   "event": "Whakatāne Futures Open",
+   "short": "Whakatāne Futures Open",
+   "venue": "Whakatane GC",
+   "date": "2027-04-18",
+   "cancelled": false,
+   "sources": []
+  },
+  {
+   "n": 4,
    "event": "Ōpōtiki Futures Open",
    "short": "Ōpōtiki Futures Open",
    "venue": "Opotiki GC",
@@ -184,20 +193,11 @@
    "sources": []
   },
   {
-   "n": 4,
+   "n": 5,
    "event": "Futures Geyserland Open",
    "short": "Futures Geyserland Open",
    "venue": "Lake View GC",
    "date": "2027-06-13",
-   "cancelled": false,
-   "sources": []
-  },
-  {
-   "n": 5,
-   "event": "Whakatāne Futures Open",
-   "short": "Whakatāne Futures Open",
-   "venue": "Whakatane GC",
-   "date": "2027-04-18",
    "cancelled": false,
    "sources": []
   },
@@ -230,10 +230,10 @@
   },
   {
    "n": 9,
-   "event": "Ōmokoroa Junior Open",
-   "short": "Ōmokoroa Junior Open",
-   "venue": "Omokoroa GC",
-   "date": "2027-11-14",
+   "event": "Waihi Futures Open",
+   "short": "Waihi Futures Open",
+   "venue": "Waihi GC",
+   "date": "2027-10-03",
    "cancelled": false,
    "sources": []
   },
@@ -248,10 +248,10 @@
   },
   {
    "n": 11,
-   "event": "Waihi Futures Open",
-   "short": "Waihi Futures Open",
-   "venue": "Waihi GC",
-   "date": "2027-10-03",
+   "event": "Ōmokoroa Junior Open",
+   "short": "Ōmokoroa Junior Open",
+   "venue": "Omokoroa GC",
+   "date": "2027-11-14",
    "cancelled": false,
    "sources": []
   }
@@ -341,6 +341,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "6f51890079a74b03dbfab11b0ce3638a27313a082f4d17f8494d0b38c6804586",
- "updated": "2026-11-16T02:13+00:00"
+ "digest": "36ff0d40b4f86821be2d0964cc1dffd6b5ef86aa667c7c22513169c43766cf3b",
+ "updated": "2026-11-16T02:14+00:00"
 }
