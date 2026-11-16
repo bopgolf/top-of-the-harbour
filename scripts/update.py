@@ -78,9 +78,12 @@ def fl_key(name):
 
 def tidy_name(name):
     name = re.sub(r"\s*-\s*", "-", re.sub(r"\s+", " ", (name or "").strip()))
-    if "," not in name and " " in name:  # "Blake Mills" -> "Mills, Blake"
-        first, last = name.rsplit(" ", 1)
-        name = f"{last}, {first}"
+    if "," not in name and " " in name:  # "Blake Mills" -> "Mills, Blake"; "Otairi Te Riini" -> "Te Riini, Otairi"
+        w = name.split(" ")
+        i = len(w) - 1
+        while i > 1 and (w[i - 1].lower() in ("te", "van", "de", "der", "von", "le", "la", "du", "di", "da", "del", "st") or re.search(r"-(te|de|van)$", w[i - 1], re.I)):
+            i -= 1
+        name = " ".join(w[i:]) + ", " + " ".join(w[:i])
     return name
 
 
@@ -291,6 +294,8 @@ def main():
         short = r.get("short_name") or re.sub(r"\s*(golf club|golf links|indoor golf|gc)$", "", r.get("venue", ""), flags=re.I).strip()
         info = {"n": n, "event": r.get("event", f"Round {n}"), "short": short or f"R{n}", "venue": r.get("venue", ""), "date": r.get("date", ""),
                 "cancelled": cancelled, "sources": []}
+        if r.get("always_counts", "").lower() in ("yes", "y", "true", "1"):
+            info["always"] = True  # e.g. a Final that counts for every club on top of its best events
         if not cancelled:
             for src in r.get("sources", "").split():
                 cid = golfnz_id(src)
