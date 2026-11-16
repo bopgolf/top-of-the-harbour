@@ -328,6 +328,7 @@ function render(D, CUR) {
   }
   const isPast = String(D.season) !== String(CUR.season);
   if (isPast) {
+    document.getElementById("subtitle").hidden = true;   // the introduction describes the current season only
     const pb = document.getElementById("pastBanner");
     pb.innerHTML = "<span>You're viewing the " + esc(D.season) + " season" + (D.status === "Final" ? " (final standings)" : "") + "." + (D.note ? '<br><span style="font-weight:400;font-size:14px">' + esc(D.note) + "</span>" : "") + '</span><a class="btn" href="./">Back to ' + esc(CUR.season) + "</a>";
     pb.hidden = false;

@@ -263,6 +263,37 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
     </div>
   </div>
   <div class="panel">
+    <h2>Edit a past season</h2>
+    <div class="pad">
+      <p class="hint">Fix a score, name or club in a season saved to History, or change its events and notes. Changes show on that season's Full leaderboard and on the honours board after you save.</p>
+      <div class="row"><label for="pastPick" style="min-width:200px">Season<select id="pastPick"><option value="">Choose a season…</option></select></label><a id="pastView" class="muted" target="_blank" rel="noopener" hidden>View this season ↗</a></div>
+      <div id="pastEditor" hidden style="margin-top:16px">
+        <h3 style="font:700 18px var(--display);margin:0 0 8px">Season details</h3>
+        <div class="grid">
+          <label for="pPer">Scores counting per club per event<input id="pPer" type="number" min="1" max="10"></label>
+          <label for="pBest">Events counting toward club total<input id="pBest" type="number" min="1" max="20"></label>
+          <label for="pAdd">Points added to 9-hole scores<input id="pAdd" type="number" min="0" max="36"></label>
+          <label class="wide" for="pNote">Note shown on this season's page (optional)<textarea id="pNote" rows="2" style="font-family:var(--body);font-size:14px"></textarea></label>
+        </div>
+        <h3 style="font:700 18px var(--display);margin:18px 0 8px">Events</h3>
+        <div class="scroll"><table id="pRounds"></table></div>
+        <h3 style="font:700 18px var(--display);margin:18px 0 8px">Clubs</h3>
+        <p class="hint">Renaming a club here renames it in every result for this season.</p>
+        <div class="scroll"><table id="pClubs"></table></div>
+        <h3 style="font:700 18px var(--display);margin:18px 0 8px">Results</h3>
+        <div class="row" style="margin-bottom:8px">
+          <label for="pFRound">Show<select id="pFRound"></select></label>
+          <label for="pFText" style="min-width:220px">Find player or club<input id="pFText" type="search" placeholder="Type a name"></label>
+          <button class="ghost" id="pAddRes">Add a result</button>
+        </div>
+        <p class="hint">Points are 18-hole stableford points as they count (for 9-hole cards, enter the raw score and choose 9 holes).</p>
+        <div class="scroll" style="max-height:520px;overflow:auto"><table id="pResults"></table></div>
+        <div class="row" style="margin-top:14px"><button id="pSave">Save season</button><button class="ghost" id="pCancel">Discard changes</button><span class="muted" id="pMsg"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
     <h2>Past winners</h2>
     <div class="pad">
       <p class="hint">For seasons before this website. Seasons saved to History fill themselves in, so there's no need to add them here. Use the club's name exactly as on the Clubs tab so its logo shows.</p>
@@ -752,6 +783,101 @@ $("nextBtn").addEventListener("click", ev => busy(ev.target, async () => {
   toast(next + " season started. Now add the dates and results links on the Events & links tab."); render();
 }));
 
+// ---------------------------------------------------------------- edit a past season
+let P = null, pSha = null, pYear = null, pDirty = false;
+const pDirtyNote = () => { pDirty = true; $("pMsg").textContent = "Unsaved changes – click Save season."; };
+async function loadPastList() {
+  try {
+    const list = await api(repoPath("/contents/data/seasons?ref=" + G.branch));
+    const years = list.map(f => f.name).filter(n => /^\d{4}\.json$/.test(n)).map(n => n.slice(0, 4)).sort().reverse();
+    $("pastPick").innerHTML = '<option value="">Choose a season…</option>' + years.map(y => `<option ${y === pYear ? "selected" : ""}>${y}</option>`).join("");
+  } catch (e) { if (e.status === 404) $("pastPick").innerHTML = '<option value="">No seasons saved yet</option>'; }
+}
+$("pastPick").addEventListener("change", async ev => {
+  const y = ev.target.value;
+  if (pDirty && !confirmInline("You have unsaved changes to " + pYear + ". Choose the season again to discard them.")) { ev.target.value = pYear || ""; return; }
+  pDirty = false; P = null; $("pastEditor").hidden = true; $("pastView").hidden = true; $("pMsg").textContent = "";
+  if (!y) return;
+  try {
+    const j = await api(repoPath("/contents/data/seasons/" + y + ".json?ref=" + G.branch));
+    const text = j.content ? b64dec(j.content) : await fetch(j.download_url).then(r => r.text());
+    P = JSON.parse(text); pSha = j.sha; pYear = y;
+    $("pastView").href = "./?season=" + y + "#clubs"; $("pastView").hidden = false;
+    renderPast(); $("pastEditor").hidden = false;
+  } catch (e) { toast(e.status ? explain(e).replace("Couldn't save: ", "Couldn't load: ") : "That season file couldn't be read.", true); }
+});
+function renderPast() {
+  const S = P.settings || {};
+  $("pPer").value = S.perClub; $("pBest").value = S.bestEvents; $("pAdd").value = S.nineHoleAdd; $("pNote").value = P.note || "";
+  $("pRounds").innerHTML = "<thead><tr><th>Round</th><th>Event</th><th>Short name</th><th>Date</th><th>Cancelled</th><th title='Counts for every club on top of their best events'>Always counts</th></tr></thead><tbody>" +
+    P.rounds.map((r, i) => `<tr><td><strong>${r.n}</strong></td><td><input data-pr="${i}" data-k="event" value="${esc(r.event)}"></td><td><input data-pr="${i}" data-k="short" value="${esc(r.short)}" style="width:120px"></td>
+      <td><input data-pr="${i}" data-k="date" type="date" value="${esc(r.date)}"></td><td><input data-pr="${i}" data-k="cancelled" type="checkbox" ${r.cancelled ? "checked" : ""} style="width:auto"></td><td><input data-pr="${i}" data-k="always" type="checkbox" ${r.always ? "checked" : ""} style="width:auto"></td></tr>`).join("") + "</tbody>";
+  $("pClubs").innerHTML = "<thead><tr><th>Club</th><th>Can win the trophy</th><th>Results</th></tr></thead><tbody>" +
+    P.clubs.map((c, i) => `<tr><td><input data-pc="${i}" value="${esc(c.name)}" style="min-width:240px"></td><td><select data-pce="${i}"><option>Yes</option><option ${c.bop === false ? "selected" : ""}>No</option></select></td><td class="muted">${P.results.filter(r => r[2] === c.name).length}</td></tr>`).join("") + "</tbody>";
+  const keep = $("pFRound").value;
+  $("pFRound").innerHTML = '<option value="">All events</option>' + P.rounds.map(r => `<option value="${r.n}">Round ${r.n} – ${esc(r.event)}</option>`).join("");
+  $("pFRound").value = keep && P.rounds.some(r => String(r.n) === keep) ? keep : String(P.rounds[0] ? P.rounds[0].n : "");
+  renderPastResults();
+}
+function renderPastResults() {
+  const fr = $("pFRound").value, q = $("pFText").value.trim().toLowerCase();
+  const clubOpts = sel => P.clubs.map(c => `<option ${c.name === sel ? "selected" : ""}>${esc(c.name)}</option>`).join("");
+  const roundOpts = sel => P.rounds.map(r => `<option value="${r.n}" ${r.n === sel ? "selected" : ""}>R${r.n}</option>`).join("");
+  const idx = P.results.map((r, i) => i).filter(i => { const r = P.results[i]; return (!fr || String(r[0]) === fr) && (!q || (r[1] + " " + r[2]).toLowerCase().includes(q)); });
+  idx.sort((a, b) => P.results[a][0] - P.results[b][0] || P.results[a][2].localeCompare(P.results[b][2]) || P.results[b][4] - P.results[a][4]);
+  $("pResults").innerHTML = "<thead><tr><th>Round</th><th>Player</th><th>Club</th><th>Holes</th><th>Points</th><th></th></tr></thead><tbody>" +
+    (idx.length ? idx.map(i => { const r = P.results[i]; return `<tr><td><select data-rr="${i}" data-c="0">${roundOpts(r[0])}</select></td><td><input data-rr="${i}" data-c="1" value="${esc(r[1])}" style="min-width:200px"></td>
+      <td><select data-rr="${i}" data-c="2">${clubOpts(r[2])}</select></td><td><select data-rr="${i}" data-c="3"><option ${r[3] === 18 ? "selected" : ""}>18</option><option ${r[3] === 9 ? "selected" : ""}>9</option></select></td>
+      <td><input data-rr="${i}" data-c="4" type="number" min="0" max="99" value="${r[4]}" style="width:80px"></td><td><button class="danger" data-rdel="${i}">Remove</button></td></tr>`; }).join("")
+      : '<tr><td colspan="6" class="muted">No results match.</td></tr>') + "</tbody>";
+}
+$("pFRound").addEventListener("change", renderPastResults);
+$("pFText").addEventListener("input", renderPastResults);
+$("pastEditor").addEventListener("input", ev => {
+  const t = ev.target, d = t.dataset;
+  if (d.pr !== undefined) { const r = P.rounds[+d.pr]; r[d.k] = t.type === "checkbox" ? t.checked : t.value.trim(); if (d.k === "always" && !t.checked) delete r.always; pDirtyNote(); }
+  else if (d.rr !== undefined) { const r = P.results[+d.rr], c = +d.c; r[c] = c === 0 || c === 3 || c === 4 ? (parseInt(t.value, 10) || 0) : t.value.trim(); pDirtyNote(); }
+  else if (d.pce !== undefined) { P.clubs[+d.pce].bop = t.value !== "No"; pDirtyNote(); }
+  else if (["pPer", "pBest", "pAdd", "pNote"].includes(t.id)) pDirtyNote();
+});
+$("pastEditor").addEventListener("change", ev => {
+  const t = ev.target;
+  if (t.dataset.pc !== undefined) {   // club rename: carry it through the results
+    const c = P.clubs[+t.dataset.pc], old = c.name, nw = t.value.trim();
+    if (!nw) { t.value = old; return; }
+    if (nw !== old) { P.results.forEach(r => { if (r[2] === old) r[2] = nw; }); c.name = nw; pDirtyNote(); renderPast(); }
+  } else if (t.dataset.pr !== undefined || t.dataset.rr !== undefined || t.dataset.pce !== undefined) {
+    const d = t.dataset;
+    if (d.pr !== undefined) { const r = P.rounds[+d.pr]; r[d.k] = t.type === "checkbox" ? t.checked : t.value.trim(); if (d.k === "always" && !t.checked) delete r.always; }
+    if (d.rr !== undefined) { const r = P.results[+d.rr], c = +d.c; r[c] = c === 0 || c === 3 || c === 4 ? (parseInt(t.value, 10) || 0) : t.value.trim(); }
+    if (d.pce !== undefined) P.clubs[+d.pce].bop = t.value !== "No";
+    pDirtyNote();
+  }
+});
+$("pResults").addEventListener("click", ev => {
+  const i = ev.target.dataset && ev.target.dataset.rdel; if (i === undefined) return;
+  if (ev.target.textContent !== "Confirm") { ev.target.textContent = "Confirm"; setTimeout(() => { if (ev.target.isConnected) ev.target.textContent = "Remove"; }, 4000); return; }
+  P.results.splice(+i, 1); pDirtyNote(); renderPast();
+});
+$("pAddRes").addEventListener("click", () => {
+  const fr = parseInt($("pFRound").value, 10) || (P.rounds[0] ? P.rounds[0].n : 1);
+  P.results.push([fr, "", P.clubs[0] ? P.clubs[0].name : "", 18, 0]); $("pFText").value = ""; $("pFRound").value = String(fr);
+  renderPastResults(); const ins = $("pResults").querySelectorAll('input[data-c="1"]'); const last = [...ins].find(x => !x.value); if (last) last.focus();
+  pDirtyNote();
+});
+$("pCancel").addEventListener("click", () => { pDirty = false; $("pastPick").value = pYear; $("pastPick").dispatchEvent(new Event("change")); });
+$("pSave").addEventListener("click", ev => busy(ev.target, async () => {
+  const bad = P.results.findIndex(r => !r[1] || !P.clubs.some(c => c.name === r[2]) || !(r[4] >= 0));
+  if (bad >= 0) { toast("A result in Round " + P.results[bad][0] + " is missing a player name, club or points.", true); $("pFRound").value = String(P.results[bad][0]); $("pFText").value = ""; renderPastResults(); return; }
+  P.settings = { perClub: parseInt($("pPer").value, 10) || 3, bestEvents: parseInt($("pBest").value, 10) || 6, nineHoleAdd: parseInt($("pAdd").value, 10) || 0 };
+  P.note = $("pNote").value.trim() || null;
+  P.results.forEach(r => (r[1] = tidyName(r[1])));
+  try { pSha = await save("data/seasons/" + pYear + ".json", JSON.stringify(P), "Edit " + pYear + " season (organiser page)", pSha); }
+  catch (e) { if (e.status === 409 || e.status === 422) { toast("This season was changed somewhere else. Choose it again to reload, then redo your change.", true); return; } throw e; }
+  await api(repoPath("/actions/workflows/update.yml/dispatches"), { method: "POST", body: JSON.stringify({ ref: G.branch }) }).catch(() => {});
+  pDirty = false; $("pMsg").textContent = "Saved " + new Date().toLocaleTimeString("en-NZ"); toast("Saved. The " + pYear + " leaderboard updates in about 2 minutes."); renderPast();
+}));
+
 // ---------------------------------------------------------------- status
 async function renderRuns() {
   try {
@@ -777,7 +903,7 @@ function route() {
   VIEWS.forEach(n => ($("v-" + n).hidden = n !== v));
   document.querySelectorAll("#tabs a").forEach(a => (a.getAttribute("href") === "#" + v ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
   if (v === "status") renderRuns();
-  if (v === "history") renderHistory();
+  if (v === "history") { renderHistory(); loadPastList(); }
 }
 function render() {
   renderEvents(); renderFixes(); renderClubs(); renderSettings(); fillClubSelect(); fixFormState(); renderLook();
