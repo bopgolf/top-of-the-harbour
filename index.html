@@ -316,6 +316,7 @@ function render(D, CUR) {
   const B = CUR.brand || {};
   if (B.logo) { const im = document.getElementById("brandLogo"); im.src = B.logo; im.alt = ""; im.hidden = false; }
   if (B.eyebrow) document.getElementById("eyebrow").textContent = B.eyebrow;
+  if (B.intro) document.getElementById("subtitle").innerHTML = B.intro.replace(/\\n/g, "\n").split(/\n\s*\n/).map(p => esc(p.trim()).replace(/\n/g, "<br>")).join("<br><br>");
   const sps = CUR.sponsors || [];
   if (sps.length) {
     document.getElementById("sponsorList").innerHTML = '<span class="lbl">Supported by</span>' + sps.map(x => {

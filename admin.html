@@ -225,7 +225,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
 <!-- ============ LOOK & SPONSORS ============ -->
 <section id="v-look" hidden>
   <div class="panel">
-    <h2>Your logo and header</h2>
+    <h2>Your logo, heading and introduction</h2>
     <div class="pad">
       <p class="hint">Your logo appears at the top left of the leaderboard, beside the title. A logo with a transparent background works best. Colours are on the <a href="#settings">Season settings</a> tab.</p>
       <div class="grid">
@@ -235,7 +235,9 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
           <button class="danger" id="brandRemove" hidden>Remove logo</button>
         </div>
         <label class="wide" for="sEyebrow">Small heading above the title<input id="sEyebrow" placeholder="Bay of Plenty Golf · Futures Series"></label>
-        <div class="wide row"><button id="saveEyebrow">Save heading</button><span class="muted" id="lookMsg"></span></div>
+        <label class="wide" for="sIntro">Introduction (the paragraph under the title)<textarea id="sIntro" rows="4" style="font-family:var(--body);font-size:15px" placeholder="Clubs compete as teams across the junior and Futures opens. The best three stableford scores from each club count at every event, and each club's best six events make up its season total."></textarea></label>
+        <p class="hint wide" style="margin:-6px 0 0">Leave it empty to use the standard wording shown in grey. Leave a blank line to start a new paragraph.</p>
+        <div class="wide row"><button id="saveEyebrow">Save heading and introduction</button><span class="muted" id="lookMsg"></span></div>
       </div>
     </div>
   </div>
@@ -658,7 +660,7 @@ function renderLook() {
   const lg = imgPreview.brand || setting("header_logo");
   const bp = $("brandPrev"); bp.style.background = setting("colour_header") || "#12432f";
   bp.innerHTML = lg ? '<img src="' + esc(lg) + '" alt="" style="max-height:74px;max-width:160px;object-fit:contain">' : '<span style="color:#fff;font-size:12px">No logo yet</span>';
-  $("brandRemove").hidden = !lg; $("sEyebrow").value = setting("eyebrow");
+  $("brandRemove").hidden = !lg; $("sEyebrow").value = setting("eyebrow"); $("sIntro").value = setting("intro").replace(/\\n/g, "\n");
   const rs = files["sponsors.csv"].rows;
   $("spTable").innerHTML = rs.length ? "<thead><tr><th>Logo</th><th>Name</th><th>Website link (optional)</th><th></th></tr></thead><tbody>" + rs.map((x, i) => `<tr>
     <td><div class="row" style="flex-wrap:nowrap;gap:8px">${imgPreview["sp" + x.name] || x.logo ? `<img src="${esc(imgPreview["sp" + x.name] || x.logo)}" alt="" style="height:36px;max-width:110px;object-fit:contain">` : '<span class="muted" style="font-size:12px">None</span>'}
@@ -678,7 +680,7 @@ $("brandFile").addEventListener("change", async ev => {
   } catch (e) { toast(e.status ? explain(e) : e.message, true); } finally { ev.target.value = ""; }
 });
 $("brandRemove").addEventListener("click", ev => busy(ev.target, async () => { setSetting("header_logo", ""); delete imgPreview.brand; await saveTable("settings.csv", "Remove header logo (organiser page)"); toast(savedMsg); renderLook(); }));
-$("saveEyebrow").addEventListener("click", ev => busy(ev.target, async () => { setSetting("eyebrow", $("sEyebrow").value.trim()); await saveTable("settings.csv", "Update heading (organiser page)"); toast(savedMsg); }));
+$("saveEyebrow").addEventListener("click", ev => busy(ev.target, async () => { setSetting("eyebrow", $("sEyebrow").value.trim()); setSetting("intro", $("sIntro").value.trim().replace(/\r?\n/g, "\\n")); await saveTable("settings.csv", "Update heading (organiser page)"); toast(savedMsg); }));
 $("addSp").addEventListener("click", () => { readSp(); files["sponsors.csv"].rows.push({ name: "", logo: "", link: "" }); renderLook(); const ins = $("spTable").querySelectorAll('[data-k="name"]'); ins[ins.length - 1].focus(); });
 $("spTable").addEventListener("click", ev => {
   const t = ev.target;
