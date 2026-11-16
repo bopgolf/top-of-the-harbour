@@ -316,7 +316,7 @@
   {
    "name": "Tauranga Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/tauranga-golf-club.png"
   },
   {
    "name": "Te Puke Golf Club",
@@ -342,6 +342,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "d07bfd1d6ecd817275006b4bc2170ddf12beecdf4eb40dccb2d825877cc2a4bf",
- "updated": "2026-11-16T19:32+00:00"
+ "digest": "24df2f264c2557e95991e470ecd9c775d27667e8968ee25681a08dd7b707ce66",
+ "updated": "2026-11-16T19:33+00:00"
 }
