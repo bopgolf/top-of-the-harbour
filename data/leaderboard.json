@@ -3,7 +3,7 @@
  "title": "Top of the Harbour",
  "status": "Live",
  "theme": {
-  "header": "#2a2e5a",
+  "header": "#002f67",
   "accent": "#00ff04"
  },
  "archive": [
@@ -341,6 +341,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "110ead01b6579e50010c9b59ae1c6565c22555ab7d744bb35cde03c0ce2c45b7",
- "updated": "2026-11-16T19:25+00:00"
+ "digest": "7a65a0b38ce09ca39c85913b5664fbd0a54b9f252fb3e9cbf650a95970678f0c",
+ "updated": "2026-11-16T19:28+00:00"
 }
