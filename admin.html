@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Top of the Harbour Organiser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: same clubhouse palette as the public board; a quiet work surface with one panel per task. */
+:root {
+  --bg: #f3f5f2; --board: #ffffff; --ink: #17231c; --muted: #5d6b62; --line: #dde3dd;
+  --green: #12432f; --green-2: #1d5c42; --gold: #e7b93c; --stripe: #f7f9f6;
+  --ok: #1e7a45; --ok-bg: #e3f4e9; --bad: #b42318; --bad-bg: #fde7e5; --warn-bg: #fff4d6;
+  --display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg:#0f1612; --board:#161f1a; --ink:#e6ece7; --muted:#9aa89e; --line:#2a3630; --green:#0d3323; --green-2:#7fc4a2; --stripe:#1a241e; --ok:#7fd39f; --ok-bg:#16301f; --bad:#ff9b91; --bad-bg:#3a1a17; --warn-bg:#3b3215; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg:#0f1612; --board:#161f1a; --ink:#e6ece7; --muted:#9aa89e; --line:#2a3630; --green:#0d3323; --green-2:#7fc4a2; --stripe:#1a241e; --ok:#7fd39f; --ok-bg:#16301f; --bad:#ff9b91; --bad-bg:#3a1a17; --warn-bg:#3b3215; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.45 var(--body); }
+header { background: var(--green); color: #fff; padding: 18px 16px 0; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+header .wrap { padding: 0; }
+.top { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
+h1 { font: 700 30px/1.1 var(--display); margin: 0; letter-spacing: .02em; }
+h1 small { font-family: var(--body); font-weight: 400; font-size: 14px; color: #cfe0d6; margin-left: 8px; }
+.top a, .top button.link { color: #cfe0d6; font-size: 14px; }
+nav { display: flex; gap: 2px; overflow-x: auto; margin-top: 14px; }
+nav a { font: 600 16px var(--display); letter-spacing: .05em; text-transform: uppercase; color: #cfe0d6; text-decoration: none; padding: 9px 14px; border-radius: 8px 8px 0 0; white-space: nowrap; }
+nav a[aria-current="page"] { background: var(--bg); color: var(--ink); }
+main { padding: 20px 0 60px; }
+.panel { background: var(--board); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 16px; }
+.panel > h2 { font: 700 21px var(--display); margin: 0; padding: 14px 16px; border-bottom: 1px solid var(--line); letter-spacing: .02em; }
+.pad { padding: 14px 16px; }
+.hint { color: var(--muted); font-size: 13px; margin: 0 0 10px; max-width: 75ch; }
+label { display: grid; gap: 3px; font-size: 13px; font-weight: 600; color: var(--muted); }
+input, select, textarea { font: inherit; font-size: 15px; color: var(--ink); background: var(--board); border: 1px solid var(--line); border-radius: 7px; padding: 7px 9px; width: 100%; }
+textarea { min-height: 70px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 1px; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.grid .wide { grid-column: 1 / -1; }
+button { font: 600 15px var(--body); border-radius: 7px; padding: 8px 16px; border: 1px solid var(--green-2); background: var(--green-2); color: #fff; cursor: pointer; }
+:root[data-theme="dark"] button:not(.ghost) { color: #0f1612; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) button:not(.ghost) { color: #0f1612; } }
+button.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+button.danger { background: transparent; color: var(--bad); border-color: var(--line); padding: 4px 10px; font-size: 13px; }
+button:disabled { opacity: .55; cursor: wait; }
+button.link { background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; font-weight: 400; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--stripe); }
+td input, td select, td textarea { padding: 5px 7px; font-size: 14px; }
+td textarea { min-height: 54px; min-width: 260px; }
+.pill { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 700; }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.pill.run { background: var(--warn-bg); color: var(--ink); }
+#toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); max-width: min(560px, calc(100% - 32px)); padding: 12px 16px; border-radius: 9px; background: var(--ink); color: var(--bg); box-shadow: 0 6px 24px rgba(0,0,0,.25); font-weight: 600; z-index: 9; }
+#toast.bad { background: var(--bad); color: #fff; }
+.login { max-width: 640px; margin: 24px auto; }
+ol.steps { margin: 0 0 12px; padding-left: 20px; } ol.steps li { margin-bottom: 6px; }
+code { background: var(--stripe); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; font-size: 13px; }
+.muted { color: var(--muted); }
+.err { color: var(--bad); font-weight: 600; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <h1>Organiser <small id="repoName"></small></h1>
+      <div class="row"><a href="./">View leaderboard</a><button class="link" id="signOut" hidden>Sign out</button></div>
+    </div>
+    <nav id="tabs" hidden aria-label="Organiser sections">
+      <a href="#events">Events &amp; links</a>
+      <a href="#fixes">Fixes</a>
+      <a href="#upload">Upload results</a>
+      <a href="#clubs">Clubs</a>
+      <a href="#settings">Season settings</a>
+      <a href="#status">Update status</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap"><main>
+
+<!-- ============ SIGN IN ============ -->
+<section id="v-login" class="panel login" hidden>
+  <h2>Sign in</h2>
+  <div class="pad">
+    <p class="hint">Changes you make here are saved to the leaderboard's GitHub project. To sign in you need a GitHub access key for this project. You only make the key once.</p>
+    <details>
+      <summary><strong>How to make your access key</strong> (about 2 minutes)</summary>
+      <ol class="steps">
+        <li>Sign in to GitHub, then open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+        <li><strong>Token name:</strong> <code>Leaderboard organiser</code>. <strong>Expiration:</strong> choose the longest available (e.g. 366 days). You'll make a new one when it expires.</li>
+        <li><strong>Repository access:</strong> choose <em>Only select repositories</em> and pick <code id="repoHint">top-of-the-harbour</code>.</li>
+        <li><strong>Permissions</strong> → <em>Repository permissions</em>: set <strong>Contents</strong> to <em>Read and write</em> and <strong>Actions</strong> to <em>Read and write</em>.</li>
+        <li>Click <strong>Generate token</strong> and copy it (it starts with <code>github_pat_</code>). Paste it below.</li>
+      </ol>
+    </details>
+    <form id="loginForm" class="grid" style="margin-top:12px">
+      <label class="wide" for="token">Access key<input id="token" type="password" autocomplete="off" placeholder="github_pat_…" required></label>
+      <label for="owner">GitHub account<input id="owner" required></label>
+      <label for="repo">Project name<input id="repo" required></label>
+      <label class="wide" style="display:flex;gap:8px;align-items:center;font-weight:400;color:var(--ink)"><input id="remember" type="checkbox" checked style="width:auto"> Remember me on this computer</label>
+      <div class="wide row"><button type="submit" id="loginBtn">Sign in</button><span id="loginMsg" class="err"></span></div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ EVENTS ============ -->
+<section id="v-events" hidden>
+  <div class="panel">
+    <h2>Events &amp; results links</h2>
+    <div class="pad">
+      <p class="hint"><strong>Short name</strong> is the word shown under each round on the leaderboard (e.g. <em>Taupō</em>); leave it blank to use the venue. Paste each event's results link(s) in the <strong>Results links</strong> box, one per line. Golf NZ links are read automatically; add both the 18-hole and 9-hole links. A link to a Google Sheet published as CSV, or a file uploaded on the <a href="#upload">Upload results</a> tab, also works.</p>
+      <div class="scroll"><table id="eventsTable"></table></div>
+      <div class="row" style="margin-top:12px"><button id="saveEvents">Save events</button><span class="muted" id="eventsMsg"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FIXES ============ -->
+<section id="v-fixes" hidden>
+  <div class="panel">
+    <h2>Add a fix</h2>
+    <div class="pad">
+      <p class="hint">Fixes always win over the results feeds, and stay in place when new results come in. Names are matched as <strong>Last, First</strong>; capitals and accents don't matter.</p>
+      <form id="fixForm" class="grid">
+        <label for="fAction">What do you want to do?
+          <select id="fAction">
+            <option value="score">Change a player's score</option>
+            <option value="club">Count a player for a different club</option>
+            <option value="add">Add a result that's missing</option>
+            <option value="remove">Remove a result</option>
+            <option value="rename">Merge two spellings of a name</option>
+          </select>
+        </label>
+        <label for="fRound" data-f="round">Round<select id="fRound"></select></label>
+        <label for="fPlayer" data-f="player">Player<input id="fPlayer" list="players" placeholder="Last, First" autocomplete="off"></label>
+        <label for="fClub" data-f="club">Club<select id="fClub"></select></label>
+        <label for="fHoles" data-f="holes">Holes<select id="fHoles"><option value="">(unchanged)</option><option>18</option><option>9</option></select></label>
+        <label for="fPoints" data-f="points">Stableford points (raw)<input id="fPoints" type="number" min="0" max="80" inputmode="numeric"></label>
+        <label for="fNew" data-f="new_value">Spelling to keep<input id="fNew" list="players" placeholder="Last, First" autocomplete="off"></label>
+        <label class="wide" for="fNote">Note (optional, for your records)<input id="fNote" placeholder="e.g. Card corrected after event"></label>
+        <div class="wide row"><button type="submit">Save fix</button><span class="muted" id="fixHelp"></span></div>
+      </form>
+      <datalist id="players"></datalist>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Current fixes</h2>
+    <div class="pad"><div class="scroll"><table id="fixTable"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ UPLOAD ============ -->
+<section id="v-upload" hidden>
+  <div class="panel">
+    <h2>Upload results for an event</h2>
+    <div class="pad">
+      <p class="hint">For an event that wasn't scored on Golf NZ. Copy the results from Excel (four columns: <strong>player, club, holes, points</strong>) and paste them below, or choose a CSV file. Enter <strong>raw</strong> stableford points; 9-hole cards get 17 added automatically.</p>
+      <div class="grid">
+        <label for="uRound">Round<select id="uRound"></select></label>
+        <label for="uFile">Or choose a CSV file<input id="uFile" type="file" accept=".csv,text/csv"></label>
+        <label class="wide" for="uText">Results<textarea id="uText" rows="8" placeholder="Smith, Jane	Omanu Golf Club	18	36&#10;Brown, Tom	Te Puke Golf Club	9	19"></textarea></label>
+        <label class="wide" style="display:flex;gap:8px;align-items:center;font-weight:400;color:var(--ink)"><input id="uLink" type="checkbox" checked style="width:auto"> Add this file to the round's results links</label>
+      </div>
+      <div id="uPreview" style="margin-top:12px"></div>
+      <div class="row" style="margin-top:12px"><button id="uSave" disabled>Save results</button><span class="muted" id="uMsg"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLUBS ============ -->
+<section id="v-clubs" hidden>
+  <div class="panel">
+    <h2>Clubs</h2>
+    <div class="pad">
+      <p class="hint"><strong>Logos:</strong> click Upload next to a club and choose its logo (PNG or JPG, ideally square). It's resized and saved straight away. Players count for the club shown on their results. If a results system spells a club differently, add that spelling under <strong>Other spellings</strong> (separate several with <code>;</code>). Clubs set to <strong>No</strong> are listed below the standings without a position.</p>
+      <div class="scroll"><table id="clubsTable"></table></div>
+      <div class="row" style="margin-top:12px"><button class="ghost" id="addClub">Add a club</button><button id="saveClubs">Save clubs</button><span class="muted" id="clubsMsg"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SETTINGS ============ -->
+<section id="v-settings" hidden>
+  <div class="panel">
+    <h2>Season settings</h2>
+    <div class="pad">
+      <form id="setForm" class="grid">
+        <label for="sSeason">Season<input id="sSeason" type="number" min="2020" max="2100"></label>
+        <label for="sTitle">Title<input id="sTitle"></label>
+        <label for="sStatus">Status<select id="sStatus"><option>Live</option><option>Final</option></select></label>
+        <label for="sPer">Scores counting per club per event<input id="sPer" type="number" min="1" max="10"></label>
+        <label for="sBest">Events counting toward club total<input id="sBest" type="number" min="1" max="20"></label>
+        <label for="sAdd">Points added to 9-hole scores<input id="sAdd" type="number" min="0" max="36"></label>
+        <label for="sHeader">Main colour (header and totals)<input id="sHeader" type="color" style="height:42px;padding:3px"></label>
+        <label for="sAccent">Highlight colour (scores that count)<input id="sAccent" type="color" style="height:42px;padding:3px"></label>
+        <div class="wide" id="preview" aria-hidden="true" style="border-radius:9px;overflow:hidden;border:1px solid var(--line)">
+          <div id="pvBand" style="padding:12px 14px;font:700 22px var(--display)">Top of the Harbour <span id="pvChip" style="font:700 12px var(--body);border-radius:999px;padding:2px 10px;margin-left:8px;vertical-align:middle">Final standings</span></div>
+          <div style="padding:10px 14px;display:flex;gap:8px;align-items:center;font-size:14px;background:var(--board)">Counted score <span id="pvCount" style="padding:3px 10px;border-radius:4px;font-weight:700">118</span> Total <span id="pvTotal" style="font:700 22px var(--display)">742</span></div>
+        </div>
+        <div class="wide row"><button type="submit">Save settings</button><button type="button" class="ghost" id="resetColours">Use original colours</button><span class="muted" id="setMsg"></span></div>
+      </form>
+      <p class="hint" style="margin-top:14px"><strong>Starting a new season:</strong> change the season here and set Status to Live; update the events and their links; then remove last season's fixes on the Fixes tab.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATUS ============ -->
+<section id="v-status" hidden>
+  <div class="panel">
+    <h2>Update status</h2>
+    <div class="pad">
+      <p class="hint">The leaderboard updates every 3 hours and after every change you save. Each update takes about 2 minutes. If an update fails, open it to see why, or ask for help.</p>
+      <div class="row" style="margin-bottom:12px"><button id="runNow">Update the leaderboard now</button><button class="ghost" id="refreshRuns">Refresh</button><span class="muted" id="runMsg"></span></div>
+      <div class="scroll"><table id="runsTable"></table></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Data check</h2>
+    <div class="pad"><p class="hint">Players who weren't counted and any problems with your links or fixes are listed on the leaderboard's <a href="./#check">Data check</a> page.</p></div>
+  </div>
+</section>
+
+</main></div>
+<div id="toast" role="status" hidden></div>
+
+<script>
+(function () {
+"use strict";
+// ---------------------------------------------------------------- helpers
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let toastTimer;
+function toast(msg, bad) { const t = $("toast"); t.textContent = msg; t.className = bad ? "bad" : ""; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), bad ? 9000 : 5000); }
+const store = { get(k) { try { return localStorage.getItem(k) || sessionStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v, keep) { try { (keep ? localStorage : sessionStorage).setItem(k, v); } catch (e) {} },
+  clear() { try { ["tth.token", "tth.owner", "tth.repo"].forEach(k => { localStorage.removeItem(k); sessionStorage.removeItem(k); }); } catch (e) {} } };
+
+function parseCSV(text) {
+  const rows = []; let row = [], f = "", q = false;
+  text = text.replace(/^﻿/, "");
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(f); rows.push(row); row = []; f = ""; }
+    else f += c;
+  }
+  if (f !== "" || row.length) { row.push(f); rows.push(row); }
+  return rows;
+}
+const cell = v => { v = v == null ? "" : String(v); return /[",\n\r]|^\s|\s$/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+const toCSV = rows => rows.map(r => r.map(cell).join(",")).join("\n") + "\n";
+// a file = { header:[...], rows:[{col:val}], comments:[raw lines], sha }
+function readTable(text) {
+  const lines = parseCSV(text).filter(r => r.some(x => x.trim() !== ""));
+  const header = (lines.shift() || []).map(h => h.trim());
+  const comments = [], rows = [];
+  for (const r of lines) {
+    if ((r[0] || "").trim().startsWith("#")) { comments.push(r); continue; }
+    const o = {}; header.forEach((h, i) => (o[h.toLowerCase()] = (r[i] || "").trim())); rows.push(o);
+  }
+  return { header, rows, comments };
+}
+function writeTable(t) { return toCSV([t.header, ...t.comments, ...t.rows.map(o => t.header.map(h => o[h.toLowerCase()] || ""))]); }
+const ensureCol = (t, c) => { if (!t.header.map(h => h.toLowerCase()).includes(c)) t.header.push(c); };
+const b64enc = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(x => (bin += String.fromCharCode(x))); return btoa(bin); };
+const b64dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g, "")), c => c.charCodeAt(0)));
+const tidyName = n => { n = (n || "").trim().replace(/\s+/g, " "); if (n && !n.includes(",") && n.includes(" ")) { const i = n.lastIndexOf(" "); n = n.slice(i + 1) + ", " + n.slice(0, i); } return n; };
+
+// ---------------------------------------------------------------- GitHub API
+const G = { token: null, owner: null, repo: null, branch: "main" };
+async function api(path, opts = {}) {
+  const r = await fetch("https://api.github.com" + path, { ...opts, headers: { Authorization: "Bearer " + G.token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(opts.body ? { "Content-Type": "application/json" } : {}) } });
+  if (r.status === 204) return null;
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.message || ("GitHub said " + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+const repoPath = p => `/repos/${encodeURIComponent(G.owner)}/${encodeURIComponent(G.repo)}${p}`;
+const files = {};
+async function load(path) {
+  try { const j = await api(repoPath("/contents/" + path + "?ref=" + encodeURIComponent(G.branch))); const t = readTable(b64dec(j.content)); t.sha = j.sha; files[path] = t; return t; }
+  catch (e) { if (e.status === 404) { return null; } throw e; }
+}
+async function save(path, text, message, sha) {
+  const j = await api(repoPath("/contents/" + path), { method: "PUT", body: JSON.stringify({ message, content: b64enc(text), branch: G.branch, ...(sha ? { sha } : {}) }) });
+  return j.content.sha;
+}
+async function saveTable(path, message) {
+  const t = files[path];
+  try { t.sha = await save(path, writeTable(t), message, t.sha); }
+  catch (e) {
+    if (e.status === 409 || e.status === 422) { toast("This file was changed somewhere else. Reloading it, so please make your change again.", true); await load(path); render(); throw e; }
+    throw e;
+  }
+}
+function explain(e) {
+  if (e.status === 401) return "Your access key isn't valid any more. Sign out and sign in with a new key.";
+  if (e.status === 403) return "Your access key doesn't have permission for this. Check it has Contents and Actions set to Read and write.";
+  return "Couldn't save: " + e.message;
+}
+async function busy(btn, fn) { btn.disabled = true; try { await fn(); } catch (e) { if (e.status !== 409 && e.status !== 422) toast(explain(e), true); } finally { btn.disabled = false; } }
+const savedMsg = "Saved. The leaderboard updates in about 2 minutes.";
+
+// ---------------------------------------------------------------- sign in
+function guessRepo() {
+  const h = location.hostname; const parts = location.pathname.split("/").filter(Boolean);
+  if (h.endsWith(".github.io")) return { owner: h.split(".")[0], repo: parts[0] && !parts[0].endsWith(".html") ? parts[0] : h };
+  return { owner: "", repo: "top-of-the-harbour" };
+}
+async function signIn(token, owner, repo) {
+  G.token = token; G.owner = owner; G.repo = repo;
+  const info = await api(repoPath(""));
+  if (!info.permissions || !info.permissions.push) { const e = new Error("no write"); e.status = 403; throw e; }
+  G.branch = info.default_branch || "main";
+}
+$("loginForm").addEventListener("submit", async ev => {
+  ev.preventDefault(); $("loginMsg").textContent = "";
+  const t = $("token").value.trim(), o = $("owner").value.trim(), r = $("repo").value.trim();
+  await busy($("loginBtn"), async () => {
+    try { await signIn(t, o, r); }
+    catch (e) { $("loginMsg").textContent = e.status === 404 ? "Can't find that project with this key. Check the account and project names, and that the key was made for this project." : e.status === 401 ? "That access key wasn't accepted. Copy it again from GitHub." : e.status === 403 ? "This key can't make changes. Set Contents to Read and write." : e.message; return; }
+    const keep = $("remember").checked; store.set("tth.token", t, keep); store.set("tth.owner", o, keep); store.set("tth.repo", r, keep);
+    await start();
+  });
+});
+$("signOut").addEventListener("click", () => { store.clear(); location.hash = ""; location.reload(); });
+
+// ---------------------------------------------------------------- data
+let known = { players: [], clubs: [], season: "" };
+async function loadAll() {
+  await Promise.all(["rounds.csv", "clubs.csv", "settings.csv", "overrides.csv"].map(load));
+  if (!files["overrides.csv"]) files["overrides.csv"] = { header: ["action", "round", "player", "club", "holes", "points", "new_value", "note"], rows: [], comments: [], sha: null };
+  try {
+    const d = await fetch("data/leaderboard.json", { cache: "no-store" }).then(r => r.json());
+    known.players = [...new Set([...(d.results || []).map(r => r[1]), ...(d.excluded || []).map(e => e.player)])].sort();
+  } catch (e) { known.players = []; }
+}
+const rounds = () => (files["rounds.csv"] ? files["rounds.csv"].rows : []);
+const clubNames = () => (files["clubs.csv"] ? files["clubs.csv"].rows.map(c => c.club).filter(Boolean) : []);
+const setting = k => { const r = (files["settings.csv"] ? files["settings.csv"].rows : []).find(x => (x.setting || "").toLowerCase() === k); return r ? r.value : ""; };
+
+// ---------------------------------------------------------------- events
+function renderEvents() {
+  $("eventsTable").innerHTML = "<thead><tr><th>Round</th><th>Event</th><th>Venue</th><th title='Shown above the round on the leaderboard'>Short name</th><th>Date</th><th>Status</th><th>Results links (one per line)</th></tr></thead><tbody>" +
+    rounds().map((r, i) => `<tr><td><strong>${esc(r.round)}</strong></td>
+      <td><input data-i="${i}" data-k="event" value="${esc(r.event)}" aria-label="Round ${esc(r.round)} event"></td>
+      <td><input data-i="${i}" data-k="venue" value="${esc(r.venue)}" aria-label="Round ${esc(r.round)} venue"></td>
+      <td><input data-i="${i}" data-k="short_name" value="${esc(r.short_name)}" placeholder="${esc((r.venue || "").replace(/\s*(golf club|golf links|indoor golf|gc)$/i, ""))}" style="width:110px" aria-label="Round ${esc(r.round)} short name"></td>
+      <td><input data-i="${i}" data-k="date" type="date" value="${esc(r.date)}" aria-label="Round ${esc(r.round)} date"></td>
+      <td><select data-i="${i}" data-k="status" aria-label="Round ${esc(r.round)} status"><option value="">On</option><option ${/^cancel/i.test(r.status) ? "selected" : ""}>Cancelled</option></select></td>
+      <td><textarea data-i="${i}" data-k="sources" aria-label="Round ${esc(r.round)} results links">${esc((r.sources || "").split(/\s+/).filter(Boolean).join("\n"))}</textarea></td></tr>`).join("") + "</tbody>";
+}
+$("saveEvents").addEventListener("click", ev => busy(ev.target, async () => {
+  const rs = rounds(); ensureCol(files["rounds.csv"], "short_name");
+  document.querySelectorAll("#eventsTable [data-k]").forEach(el => { const v = el.value.trim(); rs[+el.dataset.i][el.dataset.k] = el.dataset.k === "sources" ? v.split(/\s+/).filter(Boolean).join(" ") : v; });
+  const bad = rs.flatMap(r => (r.sources || "").split(" ").filter(s => s && !/^https?:\/\//i.test(s) && !/^results\/.+\.csv$/i.test(s)).map(s => "Round " + r.round + ": " + s));
+  if (bad.length) { toast("These links don't look right: " + bad.join(", ") + ". Use a full web link or a results/ file name.", true); return; }
+  await saveTable("rounds.csv", "Update events (organiser page)"); toast(savedMsg); $("eventsMsg").textContent = "Saved " + new Date().toLocaleTimeString("en-NZ");
+}));
+
+// ---------------------------------------------------------------- fixes
+const FIELDS = { score: ["round", "player", "points", "holes"], club: ["round", "player", "club"], add: ["round", "player", "club", "holes", "points"], remove: ["round", "player"], rename: ["player", "new_value"] };
+const REQUIRED = { score: ["round", "player", "points"], club: ["player", "club"], add: ["round", "player", "club", "holes", "points"], remove: ["player"], rename: ["player", "new_value"] };
+const HELP = { score: "Enter the corrected raw stableford points.", club: "Leave Round as 'Every round' to move the player for the whole season.", add: "For 9-hole cards choose 9; 17 points are added automatically.", remove: "Leave Round as 'Every round' to remove the player from every event.", rename: "Both spellings become one player, shown with the spelling you keep." };
+const ACT = { score: "Change score", club: "Change club", add: "Add result", remove: "Remove", rename: "Merge names" };
+function fixFormState() {
+  const a = $("fAction").value;
+  document.querySelectorAll("#fixForm [data-f]").forEach(l => (l.hidden = !FIELDS[a].includes(l.dataset.f)));
+  const optional = !REQUIRED[a].includes("round");
+  $("fRound").innerHTML = (optional ? '<option value="">Every round</option>' : "") + rounds().map(r => `<option value="${esc(r.round)}">Round ${esc(r.round)} – ${esc(r.event)}</option>`).join("");
+  $("fHoles").innerHTML = (a === "add" ? "" : '<option value="">(unchanged)</option>') + "<option>18</option><option>9</option>";
+  $("fixHelp").textContent = HELP[a];
+}
+$("fAction").addEventListener("change", fixFormState);
+$("fixForm").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const a = $("fAction").value;
+  const v = { action: a, round: $("fRound").value, player: tidyName($("fPlayer").value), club: $("fClub").value, holes: $("fHoles").value, points: $("fPoints").value, new_value: tidyName($("fNew").value), note: $("fNote").value.trim() };
+  for (const k of Object.keys(v)) if (k !== "action" && k !== "note" && !FIELDS[a].includes(k)) v[k] = "";
+  const missing = REQUIRED[a].filter(k => !v[k]);
+  if (missing.length) { toast("Please fill in: " + missing.map(k => ({ new_value: "spelling to keep" }[k] || k)).join(", "), true); return; }
+  if (known.players.length && !known.players.some(p => p.toLowerCase() === v.player.toLowerCase()) && a !== "add") {
+    if (!confirmInline("No player called “" + v.player + "” is on the results yet. Save anyway?")) return;
+  }
+  const btn = ev.submitter || $("fixForm").querySelector("button");
+  busy(btn, async () => {
+    files["overrides.csv"].rows.push(v);
+    try { await saveTable("overrides.csv", ACT[a] + ": " + v.player + " (organiser page)"); }
+    catch (e) { files["overrides.csv"].rows.pop(); throw e; }
+    toast(savedMsg); $("fPlayer").value = ""; $("fPoints").value = ""; $("fNew").value = ""; $("fNote").value = ""; renderFixes();
+  });
+});
+let pendingConfirm = null;
+function confirmInline(msg) { if (pendingConfirm === msg) { pendingConfirm = null; return true; } pendingConfirm = msg; toast(msg + " Click Save fix again to confirm."); return false; }
+function renderFixes() {
+  const rs = files["overrides.csv"].rows;
+  $("fixTable").innerHTML = rs.length ? "<thead><tr><th>Fix</th><th>Round</th><th>Player</th><th>Change</th><th>Note</th><th></th></tr></thead><tbody>" +
+    rs.map((o, i) => { const a = (o.action || "").toLowerCase(); const change = a === "score" ? o.points + " pts" + (o.holes ? " (" + o.holes + " holes)" : "") : a === "club" ? "→ " + o.club : a === "add" ? o.points + " pts, " + (o.holes || 18) + " holes, " + o.club : a === "rename" ? "→ " + o.new_value : "";
+      return `<tr><td>${esc(ACT[a] || o.action)}</td><td>${esc(o.round || "All")}</td><td>${esc(o.player)}</td><td>${esc(change)}</td><td class="muted">${esc(o.note)}</td><td><button class="danger" data-del="${i}">Delete</button></td></tr>`; }).reverse().join("") + "</tbody>"
+    : '<tbody><tr><td class="muted">No fixes yet.</td></tr></tbody>';
+}
+$("fixTable").addEventListener("click", ev => {
+  const i = ev.target.dataset && ev.target.dataset.del; if (i === undefined) return;
+  const o = files["overrides.csv"].rows[+i];
+  if (ev.target.textContent !== "Confirm delete") { ev.target.textContent = "Confirm delete"; setTimeout(() => (ev.target.textContent = "Delete"), 4000); return; }
+  busy(ev.target, async () => {
+    const removed = files["overrides.csv"].rows.splice(+i, 1);
+    try { await saveTable("overrides.csv", "Delete fix for " + o.player + " (organiser page)"); }
+    catch (e) { files["overrides.csv"].rows.splice(+i, 0, ...removed); throw e; }
+    toast(savedMsg); renderFixes();
+  });
+});
+
+// ---------------------------------------------------------------- upload
+let upRows = [];
+function parsePasted(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const tab = lines.some(l => l.includes("\t"));
+  let rows = tab ? lines.map(l => l.split("\t")) : parseCSV(lines.join("\n"));
+  rows = rows.map(r => r.map(x => (x || "").trim()));
+  if (rows.length && /player|name/i.test(rows[0][0]) && isNaN(+rows[0][3])) rows.shift();
+  return rows.filter(r => r[0]).map(r => {
+    let [player, club, holes, points] = r;
+    if (r.length === 3) { points = holes; holes = "18"; } // player, club, points
+    return { player: tidyName(player), club: club || "", holes: holes === "9" ? "9" : holes ? holes : "18", points: points || "" };
+  });
+}
+function renderUpload() {
+  upRows = parsePasted($("uText").value);
+  const clubs = new Set(clubNames().map(c => c.toLowerCase()));
+  const problems = upRows.filter(r => !/^\d+$/.test(r.points) || !["9", "18"].includes(r.holes)).length;
+  $("uPreview").innerHTML = upRows.length ? `<p class="hint">${upRows.length} players. ${problems ? '<span class="err">' + problems + " row(s) need a number for points and 9 or 18 for holes.</span>" : ""}</p><div class="scroll"><table><thead><tr><th>Player</th><th>Club</th><th>Holes</th><th>Points</th></tr></thead><tbody>` +
+    upRows.map(r => `<tr><td>${esc(r.player)}</td><td>${esc(r.club)}${clubs.has(r.club.toLowerCase()) ? "" : ' <span class="pill run">not on club list</span>'}</td><td>${esc(r.holes)}</td><td>${/^\d+$/.test(r.points) ? esc(r.points) : '<span class="err">' + (esc(r.points) || "missing") + "</span>"}</td></tr>`).join("") + "</tbody></table></div>" : "";
+  $("uSave").disabled = !upRows.length || problems > 0;
+}
+$("uText").addEventListener("input", renderUpload);
+$("uFile").addEventListener("change", async ev => { const f = ev.target.files[0]; if (!f) return; $("uText").value = await f.text(); renderUpload(); });
+$("uSave").addEventListener("click", ev => busy(ev.target, async () => {
+  const rn = $("uRound").value, season = setting("season") || new Date().getFullYear();
+  const path = `results/${season}-round-${rn}.csv`;
+  let sha = null; try { const ex = await api(repoPath("/contents/" + path + "?ref=" + G.branch)); sha = ex.sha; } catch (e) { if (e.status !== 404) throw e; }
+  if (sha && ev.target.dataset.ok !== path) { ev.target.dataset.ok = path; toast("Round " + rn + " already has an uploaded file. Click Save results again to replace it."); return; }
+  delete ev.target.dataset.ok;
+  await save(path, toCSV([["player", "club", "holes", "points"], ...upRows.map(r => [r.player, r.club, r.holes, r.points])]), `Upload results for round ${rn} (organiser page)`, sha);
+  if ($("uLink").checked) {
+    const r = rounds().find(x => x.round === rn);
+    if (r && !(r.sources || "").split(" ").includes(path)) { r.sources = ((r.sources || "") + " " + path).trim(); await saveTable("rounds.csv", `Link uploaded results to round ${rn} (organiser page)`); renderEvents(); }
+  }
+  toast(savedMsg); $("uMsg").textContent = "Saved as " + path; $("uText").value = ""; $("uFile").value = ""; renderUpload();
+}));
+
+// ---------------------------------------------------------------- clubs
+function renderClubs() {
+  const rs = files["clubs.csv"].rows;
+  $("clubsTable").innerHTML = "<thead><tr><th>Logo</th><th>Club</th><th>Can win the trophy</th><th>Other spellings</th><th></th></tr></thead><tbody>" +
+    rs.map((c, i) => `<tr><td><div class="row" style="flex-wrap:nowrap;gap:8px">${logoPreview[c.club] || c.logo ? `<img src="${esc(logoPreview[c.club] || c.logo)}" alt="" style="width:36px;height:36px;object-fit:contain;border:1px solid var(--line);border-radius:50%;background:#fff">` : '<span class="muted" style="font-size:12px">None</span>'}
+        <label class="ghost" style="display:inline-block;border:1px solid var(--line);border-radius:7px;padding:4px 10px;cursor:pointer;color:var(--ink);font-weight:600;white-space:nowrap">${c.logo ? "Change" : "Upload"}<input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" data-logo="${i}" hidden></label>
+        ${c.logo ? `<button class="danger" data-nologo="${i}">Remove</button>` : ""}</div></td>
+      <td><input data-i="${i}" data-k="club" value="${esc(c.club)}" aria-label="Club name"></td>
+      <td><select data-i="${i}" data-k="eligible" aria-label="Can win the trophy"><option>Yes</option><option ${/^n/i.test(c.eligible) ? "selected" : ""}>No</option></select></td>
+      <td><input data-i="${i}" data-k="also_known_as" value="${esc(c.also_known_as)}" placeholder="e.g. Mt Maunganui GC" aria-label="Other spellings"></td>
+      <td><button class="danger" data-rm="${i}">Remove</button></td></tr>`).join("") + "</tbody>";
+}
+const logoPreview = {};
+async function shrink(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((ok, bad) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => bad(new Error("That file isn't an image we can read. Try a PNG or JPG.")); im.src = url; });
+    const max = 200, sc = Math.min(1, max / Math.max(img.naturalWidth || max, img.naturalHeight || max));
+    const w = Math.max(1, Math.round((img.naturalWidth || max) * sc)), h = Math.max(1, Math.round((img.naturalHeight || max) * sc));
+    const cv = document.createElement("canvas"); cv.width = w; cv.height = h; cv.getContext("2d").drawImage(img, 0, 0, w, h);
+    return cv.toDataURL("image/png");
+  } finally { URL.revokeObjectURL(url); }
+}
+$("clubsTable").addEventListener("change", async ev => {
+  const i = ev.target.dataset && ev.target.dataset.logo; if (i === undefined || !ev.target.files[0]) return;
+  readClubs(); const c = files["clubs.csv"].rows[+i];
+  if (!c.club) { toast("Type the club's name first, then upload its logo.", true); return; }
+  try {
+    const dataUrl = await shrink(ev.target.files[0]);
+    const path = "logos/" + c.club.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + ".png";
+    let sha = null; try { sha = (await api(repoPath("/contents/" + path + "?ref=" + G.branch))).sha; } catch (e) { if (e.status !== 404) throw e; }
+    const bin = atob(dataUrl.split(",")[1]);
+    await api(repoPath("/contents/" + path), { method: "PUT", body: JSON.stringify({ message: "Logo for " + c.club + " (organiser page)", content: btoa(bin), branch: G.branch, ...(sha ? { sha } : {}) }) });
+    logoPreview[c.club] = dataUrl; c.logo = path; ensureCol(files["clubs.csv"], "logo");
+    await saveTable("clubs.csv", "Set logo for " + c.club + " (organiser page)");
+    toast("Logo saved. It appears on the leaderboard in about 2 minutes."); renderClubs();
+  } catch (e) { toast(e.status ? explain(e) : e.message, true); }
+});
+function readClubs() { const rs = files["clubs.csv"].rows; document.querySelectorAll("#clubsTable [data-k]").forEach(el => (rs[+el.dataset.i][el.dataset.k] = el.value.trim())); }
+$("addClub").addEventListener("click", () => { readClubs(); files["clubs.csv"].rows.push({ club: "", eligible: "Yes", also_known_as: "" }); renderClubs(); const ins = $("clubsTable").querySelectorAll('[data-k="club"]'); ins[ins.length - 1].focus(); });
+$("clubsTable").addEventListener("click", ev => { const n = ev.target.dataset && ev.target.dataset.nologo; if (n !== undefined) { readClubs(); files["clubs.csv"].rows[+n].logo = ""; delete logoPreview[files["clubs.csv"].rows[+n].club]; renderClubs(); $("clubsMsg").textContent = "Logo removed – click Save clubs to keep this change."; } });
+$("clubsTable").addEventListener("click", ev => { const i = ev.target.dataset && ev.target.dataset.rm; if (i === undefined) return; readClubs(); files["clubs.csv"].rows.splice(+i, 1); renderClubs(); $("clubsMsg").textContent = "Removed – click Save clubs to keep this change."; });
+$("saveClubs").addEventListener("click", ev => busy(ev.target, async () => {
+  readClubs(); files["clubs.csv"].rows = files["clubs.csv"].rows.filter(c => c.club);
+  await saveTable("clubs.csv", "Update clubs (organiser page)"); toast(savedMsg); $("clubsMsg").textContent = ""; renderClubs(); fillClubSelect();
+}));
+function fillClubSelect() { $("fClub").innerHTML = clubNames().map(c => `<option>${esc(c)}</option>`).join(""); }
+
+// ---------------------------------------------------------------- settings
+const SMAP = { sSeason: "season", sTitle: "title", sStatus: "status", sPer: "scores_per_club", sBest: "best_events", sAdd: "nine_hole_add", sHeader: "colour_header", sAccent: "colour_accent" };
+const DEFAULTS = { status: "Live", colour_header: "#12432f", colour_accent: "#e7b93c" };
+function renderSettings() { for (const [id, k] of Object.entries(SMAP)) $(id).value = setting(k) || DEFAULTS[k] || ""; preview(); }
+function preview() {
+  const h = $("sHeader").value, a = $("sAccent").value, n = parseInt(h.slice(1), 16);
+  const lum = (0.2126 * (n >> 16 & 255) + 0.7152 * (n >> 8 & 255) + 0.0722 * (n & 255)) / 255;
+  $("pvBand").style.background = h; $("pvBand").style.color = lum > 0.6 ? "#14181a" : "#fff";
+  $("pvChip").style.background = a; $("pvChip").style.color = "#1d1600";
+  $("pvCount").style.background = "color-mix(in srgb, " + a + " 26%, #fff)"; $("pvCount").style.boxShadow = "inset 0 0 0 1px " + a; $("pvCount").style.color = "#222";
+  $("pvTotal").style.color = h;
+}
+$("sHeader").addEventListener("input", preview); $("sAccent").addEventListener("input", preview);
+$("resetColours").addEventListener("click", () => { $("sHeader").value = DEFAULTS.colour_header; $("sAccent").value = DEFAULTS.colour_accent; preview(); $("setMsg").textContent = "Click Save settings to keep this."; });
+$("setForm").addEventListener("submit", ev => {
+  ev.preventDefault();
+  busy(ev.submitter || $("setForm").querySelector("button"), async () => {
+    const t = files["settings.csv"];
+    for (const [id, k] of Object.entries(SMAP)) { let r = t.rows.find(x => (x.setting || "").toLowerCase() === k); if (!r) { r = { setting: k, value: "" }; t.rows.push(r); } r.value = $(id).value.trim(); }
+    await saveTable("settings.csv", "Update season settings (organiser page)"); toast(savedMsg); $("setMsg").textContent = "Saved " + new Date().toLocaleTimeString("en-NZ");
+  });
+});
+
+// ---------------------------------------------------------------- status
+async function renderRuns() {
+  try {
+    const j = await api(repoPath("/actions/runs?per_page=8"));
+    $("runsTable").innerHTML = "<thead><tr><th>Started</th><th>Result</th><th>Why it ran</th><th></th></tr></thead><tbody>" + (j.workflow_runs || []).map(r => {
+      const pill = r.status !== "completed" ? '<span class="pill run">Running…</span>' : r.conclusion === "success" ? '<span class="pill ok">Updated</span>' : '<span class="pill bad">Failed</span>';
+      const why = { schedule: "Regular 3-hourly check", push: "A change was saved", workflow_dispatch: "Update now button" }[r.event] || r.event;
+      return `<tr><td>${new Date(r.created_at).toLocaleString("en-NZ", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</td><td>${pill}</td><td>${esc(why)}</td><td><a href="${esc(r.html_url)}" target="_blank" rel="noopener">Details</a></td></tr>`;
+    }).join("") + "</tbody>";
+  } catch (e) { $("runsTable").innerHTML = '<tbody><tr><td class="err">' + esc(explain(e).replace("Couldn't save: ", "Couldn't load updates: ")) + "</td></tr></tbody>"; }
+}
+$("refreshRuns").addEventListener("click", renderRuns);
+$("runNow").addEventListener("click", ev => busy(ev.target, async () => {
+  await api(repoPath("/actions/workflows/update.yml/dispatches"), { method: "POST", body: JSON.stringify({ ref: G.branch }) });
+  toast("Update started. It takes about 2 minutes."); setTimeout(renderRuns, 4000);
+}));
+
+// ---------------------------------------------------------------- shell
+const VIEWS = ["events", "fixes", "upload", "clubs", "settings", "status"];
+function route() {
+  if (!G.token) return;
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "events";
+  VIEWS.forEach(n => ($("v-" + n).hidden = n !== v));
+  document.querySelectorAll("#tabs a").forEach(a => (a.getAttribute("href") === "#" + v ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
+  if (v === "status") renderRuns();
+}
+function render() {
+  renderEvents(); renderFixes(); renderClubs(); renderSettings(); fillClubSelect(); fixFormState();
+  $("uRound").innerHTML = rounds().map(r => `<option value="${esc(r.round)}">Round ${esc(r.round)} – ${esc(r.event)}</option>`).join("");
+  $("players").innerHTML = known.players.map(p => `<option value="${esc(p)}">`).join("");
+}
+async function start() {
+  $("v-login").hidden = true; $("tabs").hidden = false; $("signOut").hidden = false;
+  $("repoName").textContent = G.owner + "/" + G.repo;
+  try { await loadAll(); } catch (e) { toast(explain(e).replace("Couldn't save: ", "Couldn't load: "), true); }
+  render(); route();
+}
+window.addEventListener("hashchange", route);
+
+(async function init() {
+  const g = guessRepo();
+  $("owner").value = store.get("tth.owner") || g.owner; $("repo").value = store.get("tth.repo") || g.repo; $("repoHint").textContent = $("repo").value || "top-of-the-harbour";
+  const t = store.get("tth.token");
+  if (t) { try { await signIn(t, $("owner").value, $("repo").value); return start(); } catch (e) { store.clear(); $("loginMsg").textContent = e.status === 401 ? "Your saved access key has expired. Make a new one and sign in again." : ""; } }
+  $("v-login").hidden = false;
+})();
+})();
+</script>
+</body>
+</html>
