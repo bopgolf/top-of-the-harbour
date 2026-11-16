@@ -10,6 +10,7 @@ on:
       - "*.csv"
       - "results/**"
       - "index.html"
+      - "admin.html"
       - "scripts/**"
 
 permissions:
@@ -29,6 +30,8 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main          # always start from the latest version
 
       - uses: actions/setup-python@v5
         with:
@@ -44,10 +47,16 @@ jobs:
           git add data
           if git diff --cached --quiet; then
             echo "Nothing new."
-          else
-            git commit -m "Update leaderboard data"
-            git push
+            exit 0
           fi
+          git commit -m "Update leaderboard data"
+          # if another change was saved meanwhile, catch up and try again
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase -X theirs origin main && git push && exit 0
+            echo "Retrying in 10 seconds..."
+            sleep 10
+          done
+          exit 1
 
       - uses: actions/configure-pages@v5
 
