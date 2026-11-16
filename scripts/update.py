@@ -9,12 +9,15 @@ data/leaderboard.json, which index.html displays.
 Sources a round can list (in the 'sources' column of rounds.csv, separated by spaces):
   * a Golf NZ tournament link   https://www.golf.co.nz/tournament-detail?competitionid=1229542
   * a results file in this repo results/round-6.csv
+  * a Golf Genius results page  https://www.golfgenius.com/pages/13064375720422177907
+                                (Golf Genius doesn't show clubs, so each player's club is taken from
+                                 their other results this season, or from a 'club' fix)
   * a link to an online CSV     e.g. a Google Sheet published as CSV
 CSV results need the columns: player, club, holes, points
 
 Standard library only, so it runs anywhere Python 3.9+ is installed.
 """
-import csv, hashlib, io, json, os, re, sys, unicodedata, urllib.parse, urllib.request
+import csv, hashlib, html, io, json, os, re, sys, unicodedata, urllib.parse, urllib.request
 from datetime import datetime, timezone, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,15 +58,26 @@ def to_int(v, default=None):
         return default
 
 
-def key(name):
-    """Name used for matching: no accents, lower case, single spaces."""
+def plain(name):
     n = unicodedata.normalize("NFKD", name or "")
-    n = "".join(c for c in n if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", n).strip().lower()
+    return "".join(c for c in n if not unicodedata.combining(c)).lower()
+
+
+def key(name):
+    """Name used for matching: letters only, no accents, lower case ("Davies, E J" = "Davies, EJ")."""
+    return re.sub(r"[^a-z,]", "", plain(name))
+
+
+def fl_key(name):
+    """First name + surname as letters, whichever way round the name was written."""
+    if "," in name:
+        last, first = name.split(",", 1)
+        name = first + " " + last
+    return re.sub(r"[^a-z]", "", plain(name))
 
 
 def tidy_name(name):
-    name = re.sub(r"\s+", " ", (name or "").strip())
+    name = re.sub(r"\s*-\s*", "-", re.sub(r"\s+", " ", (name or "").strip()))
     if "," not in name and " " in name:  # "Blake Mills" -> "Mills, Blake"
         first, last = name.rsplit(" ", 1)
         name = f"{last}, {first}"
@@ -139,6 +153,78 @@ def fetch_golfnz(cid):
     return data, rows
 
 
+def cached(name, fetch):
+    """Run fetch(); save the result, or fall back to the last saved copy if the site can't be reached."""
+    os.makedirs(CACHE, exist_ok=True)
+    path = os.path.join(CACHE, name + ".json")
+    try:
+        data = fetch()
+        if data.get("rows") or not os.path.exists(path):
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=0)
+        return data
+    except Exception as ex:
+        if os.path.exists(path):
+            warn(f"{data_label(name)} could not be reached ({ex}); used the last saved copy.")
+            with open(path, encoding="utf-8") as f:
+                return json.load(f)
+        raise
+
+
+def data_label(name):
+    return "Golf Genius results" if name.startswith("golfgenius") else name
+
+
+GG = "https://www.golfgenius.com"
+
+
+def fetch_golfgenius(src):
+    """Golf Genius results page -> {'name', 'rows': [(player, club, holes, points)]}. Player names are 'First Last'."""
+    def get(u):
+        if os.environ.get("GOLFGENIUS_FIXTURE"):
+            with open(os.path.join(os.environ["GOLFGENIUS_FIXTURE"], hashlib.md5(u.encode()).hexdigest() + ".html"), encoding="utf-8") as f:
+                return f.read()
+        return http_get(u, as_json=False)
+
+    def fetch():
+        u = src if src.startswith("http") else GG + src
+        tournaments = []
+        if "/v2tournaments/" not in u:
+            page = get(u)
+            if "/widgets/tournament_results" not in u:
+                m = re.search(r"""(https://www\.golfgenius\.com)?/leagues/\d+/widgets/tournament_results[^"'\s]*""", page)
+                if not m:
+                    raise RuntimeError("no tournament results found on this Golf Genius page")
+                page = get(html.unescape(m.group(0)) if m.group(0).startswith("http") else GG + html.unescape(m.group(0)))
+            for m in re.finditer(r"""<a[^>]+href=["'](/v2tournaments/\d+\?[^"']*)["'][^>]*>([\s\S]*?)</a>""", page):
+                tournaments.append((GG + html.unescape(m.group(1)), re.sub(r"<[^>]+>|\s+", " ", m.group(2)).strip()))
+        else:
+            tournaments.append((u, ""))
+        rows, names = [], []
+        for turl, tname in list(dict(tournaments).items()):
+            t = get(turl)
+            head = re.search(r"""<th class=['"]score['"][^>]*data-format-text=['"]([^'"]*)['"]""", t)
+            if head and "stableford" not in head.group(1).lower():
+                warn(f"Golf Genius event '{tname or turl}' shows {head.group(1)}, not stableford points, so it was skipped.")
+                continue
+            holes = 9 if re.search(r"\b9\s*-?\s*hole", tname, re.I) else 18
+            names.append(tname)
+            for m in re.finditer(r"""<tr class=['"][^'"]*aggregate-row[^'"]*['"][^>]*data-aggregate-name=['"]([^'"]*)['"][\s\S]*?</tr>""", t):
+                block = m.group(0)
+                club = re.search(r"""<div class=['"]affiliation['"]>([\s\S]*?)</div>""", block)
+                pts = re.search(r"""<td class=['"][^'"]*\bscore\b[^'"]*['"][^>]*>\s*([^<]*?)\s*</td>""", block)
+                rows.append([html.unescape(m.group(1)).strip(), html.unescape(club.group(1)).strip() if club else "", holes, (pts.group(1) if pts else "").strip()])
+        return {"name": " / ".join(n for n in names if n) or "Golf Genius results", "rows": rows}
+
+    data = cached("golfgenius-" + hashlib.md5(src.encode()).hexdigest()[:12], fetch)
+    out = []
+    for name, club, holes, pts in data["rows"]:
+        p = to_int(pts)
+        if p is not None and name:
+            out.append((name, club, holes, p))
+    return data["name"], out
+
+
 _fixture_cache = None
 
 
@@ -156,6 +242,8 @@ def fixture_lookup(path, cid):
 
 
 def read_results_csv(text, label):
+    if text.lstrip()[:15].lower().startswith(("<!doctype", "<html")):
+        raise RuntimeError("this link is a web page, not a CSV file. Golf NZ and Golf Genius links work; for other sites, upload the results instead")
     rows = []
     for r in csv.DictReader(io.StringIO(text)):
         r = {(k or "").strip().lower(): (v or "").strip() for k, v in r.items()}
@@ -213,6 +301,13 @@ def main():
                         link = f"{GOLFNZ}/tournament-detail?competitionid={cid}"
                         if not info["date"] and data.get("date"):
                             info["date"] = data["date"]
+                    elif "golfgenius.com" in src.lower():
+                        name, rows = fetch_golfgenius(src)
+                        label, link = "Golf Genius – " + name if name != "Golf Genius results" else name, src
+                        for p, club, holes, pts in rows:
+                            raw.append({"round": n, "player": p, "club": club, "holes": holes, "points": pts, "source": label, "natural": True})
+                        info["sources"].append({"label": label, "link": link, "count": len(rows)})
+                        continue
                     elif src.lower().startswith("http"):
                         rows = read_results_csv(http_get(src, as_json=False), src)
                         label, link = "Online results sheet", src
@@ -229,6 +324,26 @@ def main():
         rounds.append(info)
     rounds.sort(key=lambda x: x["n"])
     cancelled_rounds = {r["n"] for r in rounds if r["cancelled"]}
+
+    # ---- results that came without a club or in "First Last" order (e.g. Golf Genius):
+    #      match them to the same player's other results this season
+    from collections import Counter
+    known = {}
+    for x in raw:
+        if not x.get("natural") and alias.get(key(x["club"])):
+            known.setdefault(fl_key(x["player"]), Counter())[(x["player"], alias[key(x["club"])])] += 1
+    for x in raw:
+        if not x.get("natural"):
+            continue
+        hit = known.get(fl_key(x["player"]))
+        if hit:
+            (name, club), _ = hit.most_common(1)[0]
+            x["player"] = name
+            if not x["club"]:
+                x["club"] = club
+        else:
+            x["player"] = tidy_name(x["player"])
+        x.pop("natural", None)
 
     # ---- overrides, applied in file order
     for i, o in enumerate(overrides, start=2):
@@ -266,7 +381,7 @@ def main():
             continue
         club = alias.get(key(x["club"]))
         if not club:
-            excluded.append({"round": x["round"], "player": x["player"], "club": x["club"] or "(none)", "points": x["points"], "source": x["source"]})
+            excluded.append({"round": x["round"], "player": x["player"], "club": x["club"] or "(no club given – add a club fix)", "points": x["points"], "source": x["source"]})
             continue
         if x["holes"] not in (9, 18):
             warn(f"Round {x['round']}: {x['player']} has holes={x['holes']}; treated as 18.")
