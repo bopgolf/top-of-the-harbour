@@ -143,13 +143,7 @@
    "venue": "Fore Seasons Indoor Golf",
    "date": "2026-09-20",
    "cancelled": false,
-   "sources": [
-    {
-     "label": "results/2026-round-8-fore-seasons.csv",
-     "link": null,
-     "count": 25
-    }
-   ]
+   "sources": []
   },
   {
    "n": 9,
@@ -3608,181 +3602,6 @@
    32
   ],
   [
-   8,
-   "Baird, Noah",
-   "Futures Geyserland",
-   18,
-   39
-  ],
-  [
-   8,
-   "Beazley, Rome",
-   "Futures Geyserland",
-   18,
-   43
-  ],
-  [
-   8,
-   "Bowater, Casey",
-   "Futures Geyserland",
-   18,
-   32
-  ],
-  [
-   8,
-   "Fell-Aranga, Kylan",
-   "Futures Geyserland",
-   18,
-   37
-  ],
-  [
-   8,
-   "Flay-Martin, Stellen",
-   "Futures Geyserland",
-   18,
-   24
-  ],
-  [
-   8,
-   "Shipgood, Kauri-Makaio",
-   "Futures Geyserland",
-   18,
-   41
-  ],
-  [
-   8,
-   "Te Kanawa-Thompson, Ngaio",
-   "Futures Geyserland",
-   18,
-   24
-  ],
-  [
-   8,
-   "Uerata, Nealson",
-   "Futures Geyserland",
-   18,
-   42
-  ],
-  [
-   8,
-   "Beach, Henley",
-   "Mount Maunganui Golf Club",
-   18,
-   36
-  ],
-  [
-   8,
-   "Clinch, Jacob",
-   "Mount Maunganui Golf Club",
-   18,
-   39
-  ],
-  [
-   8,
-   "Flevill, Archer",
-   "Mount Maunganui Golf Club",
-   18,
-   41
-  ],
-  [
-   8,
-   "Goldsmith, Cameron",
-   "Mount Maunganui Golf Club",
-   18,
-   54
-  ],
-  [
-   8,
-   "Gray, Summer",
-   "Mount Maunganui Golf Club",
-   18,
-   42
-  ],
-  [
-   8,
-   "Holmes, Mac",
-   "Mount Maunganui Golf Club",
-   18,
-   36
-  ],
-  [
-   8,
-   "Muntz, Parker",
-   "Mount Maunganui Golf Club",
-   18,
-   43
-  ],
-  [
-   8,
-   "Murdoch, Maxwell",
-   "Mount Maunganui Golf Club",
-   18,
-   37
-  ],
-  [
-   8,
-   "Stone, Rylan",
-   "Mount Maunganui Golf Club",
-   18,
-   22
-  ],
-  [
-   8,
-   "Tulloch, Mason",
-   "Mount Maunganui Golf Club",
-   18,
-   41
-  ],
-  [
-   8,
-   "Tulloch, Thea",
-   "Mount Maunganui Golf Club",
-   18,
-   47
-  ],
-  [
-   8,
-   "Rowse, Noah",
-   "Omanu Golf Club",
-   18,
-   36
-  ],
-  [
-   8,
-   "Walker, Keiton",
-   "Opotiki Golf Club",
-   18,
-   37
-  ],
-  [
-   8,
-   "Davies, E J",
-   "Tauranga Golf Club",
-   18,
-   46
-  ],
-  [
-   8,
-   "Williams, Perry",
-   "Tauranga Golf Club",
-   18,
-   49
-  ],
-  [
-   8,
-   "Lourie, Mason",
-   "Te Puke Golf Club",
-   18,
-   18
-  ],
-  [
-   8,
-   "O'Rourke, Zachary",
-   "Te Puke Golf Club",
-   18,
-   39
-  ],
-  [
    9,
    "Gould, Hunter",
    "Fairview Golf Club",
@@ -4934,6 +4753,6 @@
   }
  ],
  "warnings": [],
- "digest": "0be25b0095302f3b7d1d5b47110c0423675666a620dd3b02e300cba07dbf9f38",
- "updated": "2026-11-16T00:27+00:00"
+ "digest": "8bc1f3b7e5581acdbda6bfdd83e553099815d0450c719f29e15f34ee5c40feb4",
+ "updated": "2026-11-16T00:28+00:00"
 }
