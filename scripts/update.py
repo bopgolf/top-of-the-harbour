@@ -417,7 +417,7 @@ def main():
         "theme": {k: v for k, v in (("header", settings.get("colour_header", "")), ("accent", settings.get("colour_accent", "")))
                   if re.fullmatch(r"#[0-9a-fA-F]{6}", v or "")},
         "archive": archive, "honours": honours,
-        "brand": {"logo": settings.get("header_logo", ""), "eyebrow": settings.get("eyebrow", "Bay of Plenty Golf · Futures Series")},
+        "brand": {"logo": settings.get("header_logo", ""), "eyebrow": settings.get("eyebrow", "Bay of Plenty Golf · Futures Series"), "intro": settings.get("intro", "")},
         "sponsors": [{"name": x.get("name", ""), "logo": x.get("logo", ""), "link": x.get("link", "")}
                      for x in read_csv("sponsors.csv", required=False) if x.get("logo") or x.get("name")],
         "settings": S, "rounds": rounds, "clubs": clubs, "results": results,
