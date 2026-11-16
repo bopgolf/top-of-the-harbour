@@ -2,7 +2,10 @@
  "season": 2026,
  "title": "Top of the Harbour",
  "status": "Final",
- "theme": {},
+ "theme": {
+  "header": "#0011ff",
+  "accent": "#00ff04"
+ },
  "settings": {
   "perClub": 3,
   "bestEvents": 6,
@@ -193,12 +196,12 @@
   {
    "name": "Fairview Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/fairview-golf-club.png"
   },
   {
    "name": "Futures Geyserland",
    "bop": true,
-   "logo": ""
+   "logo": "logos/futures-geyserland.png"
   },
   {
    "name": "Kawerau Golf Club",
@@ -208,27 +211,27 @@
   {
    "name": "Mount Maunganui Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/mount-maunganui-golf-club.png"
   },
   {
    "name": "Ohope Beach Golf Links",
    "bop": true,
-   "logo": ""
+   "logo": "logos/ohope-beach-golf-links.png"
   },
   {
    "name": "Omanu Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/omanu-golf-club.png"
   },
   {
    "name": "Omokoroa Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/omokoroa-golf-club.png"
   },
   {
    "name": "Opotiki Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/opotiki-golf-club.png"
   },
   {
    "name": "Otumoetai Golf Club",
@@ -4931,6 +4934,6 @@
   }
  ],
  "warnings": [],
- "digest": "43864bfaade698d936935adb3fdecc7a562f68e0c7bc231b31afba6a0a199a39",
- "updated": "2026-11-16T00:07+00:00"
+ "digest": "98a25dd2319bd71ddebdcc429e086d5b73bcad913c4ef8905bb33e076b853a41",
+ "updated": "2026-11-16T00:17+00:00"
 }
