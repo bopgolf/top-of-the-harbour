@@ -3759,6 +3759,13 @@
   ],
   [
    8,
+   "Bowater, Casey",
+   "Futures Geyserland",
+   18,
+   32
+  ],
+  [
+   8,
    "Fell-Aranga, Kylan",
    "Futures Geyserland",
    18,
@@ -5041,13 +5048,6 @@
    "source": "Rotorua Futures Open - 18 Holes"
   },
   {
-   "round": 8,
-   "player": "Bowater, Casey",
-   "club": "(no club given – add a club fix)",
-   "points": 32,
-   "source": "Golf Genius – Futures Open"
-  },
-  {
    "round": 9,
    "player": "Ma, Sherry",
    "club": "Futures Waikato",
@@ -5070,6 +5070,6 @@
   }
  ],
  "warnings": [],
- "digest": "0bddce8595922dd8aca2fba50af1916d796ff8406ae38768ce7acd9635899789",
- "updated": "2026-11-16T01:03+00:00"
+ "digest": "ca7ae46545cc67d303f48a4a149fc1b1fbca9b765db1a1b68d387f4f30c0c5ed",
+ "updated": "2026-11-16T01:05+00:00"
 }
