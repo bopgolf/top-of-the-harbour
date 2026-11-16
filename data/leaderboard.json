@@ -246,7 +246,7 @@
   {
    "name": "Taupo Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/taupo-golf-club.png"
   },
   {
    "name": "Tauranga Golf Club",
@@ -4934,6 +4934,6 @@
   }
  ],
  "warnings": [],
- "digest": "fb45a239eb73348f33810a36ec150a92321a907a77021da7d75d89a24a19551b",
- "updated": "2026-11-16T00:23+00:00"
+ "digest": "0be25b0095302f3b7d1d5b47110c0423675666a620dd3b02e300cba07dbf9f38",
+ "updated": "2026-11-16T00:27+00:00"
 }
