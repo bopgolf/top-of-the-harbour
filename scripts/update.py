@@ -185,7 +185,7 @@ def main():
     clubs, alias = [], {}
     for c in clubs_in:
         name = c["club"]
-        clubs.append({"name": name, "bop": c.get("eligible", "yes").lower() not in ("no", "n", "false", "0")})
+        clubs.append({"name": name, "bop": c.get("eligible", "yes").lower() not in ("no", "n", "false", "0"), "logo": c.get("logo", "")})
         alias[key(name)] = name
         for a in re.split(r"[;|]", c.get("also_known_as", "")):
             if a.strip():
@@ -197,7 +197,8 @@ def main():
         if n is None:
             continue
         cancelled = r.get("status", "").lower().startswith("cancel")
-        info = {"n": n, "event": r.get("event", f"Round {n}"), "venue": r.get("venue", ""), "date": r.get("date", ""),
+        short = r.get("short_name") or re.sub(r"\s*(golf club|golf links|indoor golf|gc)$", "", r.get("venue", ""), flags=re.I).strip()
+        info = {"n": n, "event": r.get("event", f"Round {n}"), "short": short or f"R{n}", "venue": r.get("venue", ""), "date": r.get("date", ""),
                 "cancelled": cancelled, "sources": []}
         if not cancelled:
             for src in r.get("sources", "").split():
@@ -289,6 +290,8 @@ def main():
         "season": to_int(settings.get("season"), datetime.now(NZ).year),
         "title": settings.get("title", "Top of the Harbour"),
         "status": settings.get("status", "Live"),
+        "theme": {k: v for k, v in (("header", settings.get("colour_header", "")), ("accent", settings.get("colour_accent", "")))
+                  if re.fullmatch(r"#[0-9a-fA-F]{6}", v or "")},
         "settings": S, "rounds": rounds, "clubs": clubs, "results": results,
         "excluded": sorted(excluded, key=lambda e: (e["round"], e["player"])), "warnings": warnings,
     }
