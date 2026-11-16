@@ -2,6 +2,7 @@
  "season": 2026,
  "title": "Top of the Harbour",
  "status": "Final",
+ "theme": {},
  "settings": {
   "perClub": 3,
   "bestEvents": 6,
@@ -11,6 +12,7 @@
   {
    "n": 1,
    "event": "Taupō Futures Open",
+   "short": "Taupo",
    "venue": "Taupo GC",
    "date": "2026-02-22",
    "cancelled": false,
@@ -30,6 +32,7 @@
   {
    "n": 2,
    "event": "The Clubroom Tauranga Futures Open",
+   "short": "Tauranga",
    "venue": "Tauranga GC",
    "date": "2026-03-08",
    "cancelled": false,
@@ -49,6 +52,7 @@
   {
    "n": 3,
    "event": "Ōpōtiki Futures Open",
+   "short": "Opotiki",
    "venue": "Opotiki GC",
    "date": "2026-05-24",
    "cancelled": false,
@@ -68,6 +72,7 @@
   {
    "n": 4,
    "event": "Futures Geyserland Open",
+   "short": "Lake View",
    "venue": "Lake View GC",
    "date": "2026-06-07",
    "cancelled": false,
@@ -87,6 +92,7 @@
   {
    "n": 5,
    "event": "Whakatāne Futures Open",
+   "short": "Whakatane",
    "venue": "Whakatane GC",
    "date": "2026-04-19",
    "cancelled": true,
@@ -95,6 +101,7 @@
   {
    "n": 6,
    "event": "Mount Junior Open",
+   "short": "Mount",
    "venue": "Mount GC",
    "date": "2026-07-26",
    "cancelled": false,
@@ -109,6 +116,7 @@
   {
    "n": 7,
    "event": "Rotorua Futures Open",
+   "short": "Rotorua",
    "venue": "Rotorua GC",
    "date": "2026-08-16",
    "cancelled": false,
@@ -128,6 +136,7 @@
   {
    "n": 8,
    "event": "Fore Seasons Futures Open",
+   "short": "Fore Seasons",
    "venue": "Fore Seasons Indoor Golf",
    "date": "2026-09-20",
    "cancelled": false,
@@ -142,6 +151,7 @@
   {
    "n": 9,
    "event": "Ōmokoroa Junior Open",
+   "short": "Omokoroa",
    "venue": "Omokoroa GC",
    "date": "2026-10-18",
    "cancelled": false,
@@ -161,6 +171,7 @@
   {
    "n": 10,
    "event": "Omanu Futures Open",
+   "short": "Omanu",
    "venue": "Omanu GC",
    "date": "2026-11-01",
    "cancelled": false,
@@ -181,67 +192,83 @@
  "clubs": [
   {
    "name": "Fairview Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Futures Geyserland",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Kawerau Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Mount Maunganui Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Ohope Beach Golf Links",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Omanu Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Omokoroa Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Opotiki Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Otumoetai Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Reporoa Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Taupo Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Tauranga Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Te Puke Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Turangi Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Waikite Valley Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   },
   {
    "name": "Whakatane Golf Club",
-   "bop": true
+   "bop": true,
+   "logo": ""
   }
  ],
  "results": [
@@ -4904,6 +4931,6 @@
   }
  ],
  "warnings": [],
- "digest": "ddd83d6e17588ac93941de093f9c7776d18534e50fa364a488e13056ade883f9",
- "updated": "2026-11-15T22:34+00:00"
+ "digest": "43864bfaade698d936935adb3fdecc7a562f68e0c7bc231b31afba6a0a199a39",
+ "updated": "2026-11-16T00:07+00:00"
 }
