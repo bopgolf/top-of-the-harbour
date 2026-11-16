@@ -196,7 +196,10 @@ def main():
         n = to_int(r.get("round"))
         if n is None:
             continue
-        cancelled = r.get("status", "").lower().startswith("cancel")
+        status = r.get("status", "").strip().lower()
+        if status in ("off", "hidden"):
+            continue  # switched off: not shown and not counted
+        cancelled = status.startswith("cancel")
         short = r.get("short_name") or re.sub(r"\s*(golf club|golf links|indoor golf|gc)$", "", r.get("venue", ""), flags=re.I).strip()
         info = {"n": n, "event": r.get("event", f"Round {n}"), "short": short or f"R{n}", "venue": r.get("venue", ""), "date": r.get("date", ""),
                 "cancelled": cancelled, "sources": []}
@@ -285,6 +288,12 @@ def main():
         r[1] = best[key(r[1])]
     results.sort(key=lambda r: (r[0], r[2], r[1]))
 
+    # ---- history: archived seasons (data/seasons/YYYY.json) and older winners (honours.csv)
+    seasons_dir = os.path.join(ROOT, "data", "seasons")
+    archive = sorted((int(f[:-5]) for f in os.listdir(seasons_dir) if re.fullmatch(r"\d{4}\.json", f)), reverse=True) if os.path.isdir(seasons_dir) else []
+    honours = [{k: h.get(k, "") for k in ("season", "winner", "runner_up", "third", "top_individual", "note")}
+               for h in read_csv("honours.csv", required=False) if to_int(h.get("season"))]
+
     # ---- write, keeping 'updated' unless something changed
     payload = {
         "season": to_int(settings.get("season"), datetime.now(NZ).year),
@@ -292,6 +301,10 @@ def main():
         "status": settings.get("status", "Live"),
         "theme": {k: v for k, v in (("header", settings.get("colour_header", "")), ("accent", settings.get("colour_accent", "")))
                   if re.fullmatch(r"#[0-9a-fA-F]{6}", v or "")},
+        "archive": archive, "honours": honours,
+        "brand": {"logo": settings.get("header_logo", ""), "eyebrow": settings.get("eyebrow", "Bay of Plenty Golf · Futures Series")},
+        "sponsors": [{"name": x.get("name", ""), "logo": x.get("logo", ""), "link": x.get("link", "")}
+                     for x in read_csv("sponsors.csv", required=False) if x.get("logo") or x.get("name")],
         "settings": S, "rounds": rounds, "clubs": clubs, "results": results,
         "excluded": sorted(excluded, key=lambda e: (e["round"], e["player"])), "warnings": warnings,
     }
