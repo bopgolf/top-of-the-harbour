@@ -245,6 +245,15 @@
    "date": "2027-10-31",
    "cancelled": false,
    "sources": []
+  },
+  {
+   "n": 11,
+   "event": "Waihi Futures Open",
+   "short": "Waihi Futures Open",
+   "venue": "Waihi GC",
+   "date": "2027-10-03",
+   "cancelled": false,
+   "sources": []
   }
  ],
  "clubs": [
@@ -332,6 +341,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "b5fb1f6fdb6525c7d08708dc9d3f89a415916d041b5ea16c105b75627f7aed25",
- "updated": "2026-11-16T02:10+00:00"
+ "digest": "6f51890079a74b03dbfab11b0ce3638a27313a082f4d17f8494d0b38c6804586",
+ "updated": "2026-11-16T02:13+00:00"
 }
