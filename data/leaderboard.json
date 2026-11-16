@@ -340,12 +340,12 @@
   {
    "name": "Whakatane Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/whakatane-golf-club.png"
   }
  ],
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "c00e98a19c0be00b80ba11451967cde975813ca4817aea63097cd9221e2095b2",
- "updated": "2026-11-16T20:09+00:00"
+ "digest": "28e4d73904bab519a21ad1fb1fb22ef9c8cb82b8d5b9d28e122f87648bcb3824",
+ "updated": "2026-11-16T20:10+00:00"
 }
