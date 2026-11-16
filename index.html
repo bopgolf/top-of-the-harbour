@@ -50,12 +50,12 @@ nav.tabs a[aria-current="page"] { background: var(--bg); color: var(--ink); opac
 a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 main { padding: 22px 0 40px; }
 .podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
-.pod { background: var(--board); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: center; border-top: 5px solid var(--line); }
+.pod { background: var(--board); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; grid-template-columns: auto 1fr; gap: 2px 16px; align-items: center; border-top: 5px solid var(--line); }
 .pod.p1 { border-top-color: var(--accent); }
 .pod .crest { grid-row: span 3; }
-.pod .crest .logo { width: 56px; height: 56px; font-size: 18px; }
+.pod .crest .logo { width: 92px; height: 92px; font-size: 26px; box-shadow: 0 2px 6px rgba(0,0,0,.1); }
 .pod .pos { font-family: var(--display); font-size: 14px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
-.pod .name { font-weight: 700; font-size: 17px; }
+.pod .name { font-weight: 600; font-size: 15px; line-height: 1.25; }
 .pod .pts { font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--figure); line-height: 1; font-variant-numeric: tabular-nums; }
 .pod .gap { color: var(--muted); font-size: 13px; grid-column: 2; }
 .panel { background: var(--board); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
@@ -86,6 +86,12 @@ thead .sticky, thead .sticky2 { background: var(--stripe); z-index: 2; }
 .logo { width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%; object-fit: contain; background: #fff; border: 1px solid var(--line); display: inline-grid; place-items: center; font: 700 11px var(--display); letter-spacing: .02em; color: var(--brand); overflow: hidden; }
 span.logo { background: color-mix(in srgb, var(--brand) 10%, var(--board)); color: var(--figure); }
 .logo.sm { width: 22px; height: 22px; font-size: 9px; }
+/* club rows: the logo leads, the name supports it */
+.crestcell { display: flex; align-items: center; gap: 14px; text-align: left; min-width: 230px; padding: 4px 0; }
+.crestcell .logo { width: 58px; height: 58px; font-size: 18px; border-width: 1px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.crestcell .cname { font-size: 14px; font-weight: 600; line-height: 1.2; white-space: normal; max-width: 170px; color: var(--ink); }
+#clubTable td, #eventTable td { padding-top: 6px; padding-bottom: 6px; }
+#eventTable .crestcell .logo { width: 46px; height: 46px; font-size: 15px; }
 td.ne { color: var(--muted); font-size: 12px; }
 .sep td { background: var(--bg) !important; color: var(--muted); font-size: 13px; text-align: left; font-weight: 600; }
 .note { color: var(--muted); font-size: 13px; padding: 12px 16px; margin: 0; max-width: 90ch; }
@@ -106,10 +112,13 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   .podium { grid-template-columns: 1fr; }
-  .pod .crest .logo { width: 44px; height: 44px; }
+  .pod .crest .logo { width: 64px; height: 64px; font-size: 20px; }
+  .crestcell { flex-direction: column; gap: 4px; min-width: 96px; text-align: center; }
+  .crestcell .logo { width: 46px; height: 46px; font-size: 15px; }
+  .crestcell .cname { font-size: 11.5px; max-width: 96px; }
   .pod .pts { font-size: 28px; }
   th, td { padding: 7px 4px; }
-  .who .logo { display: none; }
+  #playerTable .who .logo, #fieldTable .who .logo { display: none; }
   thead th.rd { width: 40px; min-width: 40px; }
 }
 @media (prefers-reduced-motion: no-preference) { nav.tabs a { transition: background .15s, color .15s, opacity .15s; } }
@@ -276,7 +285,7 @@ function render(D) {
     if (!b.total) return '<td class="dash">–</td>';
     return '<td class="' + (c.counted.has(i) ? "count" : "") + '" title="' + esc(b.top.map(t => t.player + " " + t.score).join(", ")) + '">' + b.total + "</td>";
   };
-  const clubRow = (c, posText) => '<tr><td class="pos sticky">' + posText + '</td><td class="sticky2"><span class="who">' + logo(c.name) + "<b>" + esc(c.name) + '</b></span></td><td class="total">' + c.total + "</td><td>" + c.events + "</td>" + R.map((r, i) => cell(c, i)).join("") + "</tr>";
+  const clubRow = (c, posText) => '<tr><td class="pos sticky">' + posText + '</td><td class="sticky2"><span class="crestcell">' + logo(c.name) + '<span class="cname">' + esc(c.name) + '</span></span></td><td class="total">' + c.total + "</td><td>" + c.events + "</td>" + R.map((r, i) => cell(c, i)).join("") + "</tr>";
   const cols = R.length + 4;
   document.getElementById("clubTable").innerHTML =
     '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left sticky2" scope="col">Club</th><th scope="col">Total</th><th scope="col">Events</th>' + roundHead() + "</tr></thead><tbody>" +
@@ -335,7 +344,7 @@ function render(D) {
     const et = new Set(list.map(x => x.pos).filter((p, k, a) => a.indexOf(p) !== k));
     const heads = Array.from({ length: S.perClub }, (_, k) => '<th class="left" scope="col">Counting player ' + (k + 1) + "</th>").join("");
     t.innerHTML = '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left sticky2" scope="col">Club</th><th scope="col">Score</th><th scope="col">Players</th>' + heads + "</tr></thead><tbody>" +
-      list.map(x => '<tr><td class="pos sticky">' + (et.has(x.pos) ? "T" : "") + x.pos + '</td><td class="sticky2"><span class="who">' + logo(x.c.name) + "<b>" + esc(x.c.name) + '</b></span></td><td class="total">' + x.b.total + "</td><td>" + x.b.n + "</td>" +
+      list.map(x => '<tr><td class="pos sticky">' + (et.has(x.pos) ? "T" : "") + x.pos + '</td><td class="sticky2"><span class="crestcell">' + logo(x.c.name) + '<span class="cname">' + esc(x.c.name) + '</span></span></td><td class="total">' + x.b.total + "</td><td>" + x.b.n + "</td>" +
         Array.from({ length: S.perClub }, (_, k) => { const p = x.b.top[k]; return '<td class="left">' + (p ? '<span class="cplayer">' + esc(p.player) + " <strong>" + p.score + "</strong></span>" : '<span class="dash">–</span>') + "</td>"; }).join("") + "</tr>").join("") + "</tbody>";
     // full field
     const counted = new Set(list.flatMap(x => x.b.top.map(p => p.player + "|" + p.club)));
