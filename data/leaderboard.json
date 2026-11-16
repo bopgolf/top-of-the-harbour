@@ -7,7 +7,11 @@
   "accent": "#00ff04"
  },
  "archive": [
-  2026
+  2026,
+  2025,
+  2024,
+  2023,
+  2022
  ],
  "honours": [
   {
@@ -342,6 +346,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "1ece7835f45433f429ef7b56ed5c9f8b9aaad40d35c1eb275a82adfe10661afc",
- "updated": "2026-11-16T19:35+00:00"
+ "digest": "9fb841661c4c5b19f1ba79bfebc362bc7586b7b0cae2484803368a5068ab7890",
+ "updated": "2026-11-16T20:05+00:00"
 }
