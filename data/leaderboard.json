@@ -236,7 +236,7 @@
   {
    "name": "Otumoetai Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/otumoetai-golf-club.png"
   },
   {
    "name": "Reporoa Golf Club",
@@ -4934,6 +4934,6 @@
   }
  ],
  "warnings": [],
- "digest": "98a25dd2319bd71ddebdcc429e086d5b73bcad913c4ef8905bb33e076b853a41",
- "updated": "2026-11-16T00:17+00:00"
+ "digest": "fb45a239eb73348f33810a36ec150a92321a907a77021da7d75d89a24a19551b",
+ "updated": "2026-11-16T00:23+00:00"
 }
