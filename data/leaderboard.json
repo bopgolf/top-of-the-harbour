@@ -330,7 +330,7 @@
   {
    "name": "Turangi Golf Club",
    "bop": true,
-   "logo": ""
+   "logo": "logos/turangi-golf-club.png"
   },
   {
    "name": "Waikite Valley Golf Club",
@@ -346,6 +346,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "9fb841661c4c5b19f1ba79bfebc362bc7586b7b0cae2484803368a5068ab7890",
- "updated": "2026-11-16T20:05+00:00"
+ "digest": "c00e98a19c0be00b80ba11451967cde975813ca4817aea63097cd9221e2095b2",
+ "updated": "2026-11-16T20:09+00:00"
 }
