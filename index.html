@@ -123,6 +123,14 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
 .titles .t { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 4px 4px; font-size: 14px; }
 .titles .t b { font: 700 18px var(--display); color: var(--figure); }
 .mini { display: inline-flex; align-items: center; gap: 8px; text-align: left; white-space: normal; }
+td.pos .pn { display: block; line-height: 1; }
+.mv { display: block; font: 700 11px var(--body); line-height: 1.1; margin-top: 2px; white-space: nowrap; }
+.mv.up { color: #16a34a; } .mv.down { color: #dc2626; } .mv.same { color: var(--muted); } .mv.new { color: var(--muted); font-size: 9px; letter-spacing: .05em; }
+:root[data-theme="dark"] .mv.up { color: #4ade80; } :root[data-theme="dark"] .mv.down { color: #f87171; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mv.up { color: #4ade80; } :root:not([data-theme="light"]) .mv.down { color: #f87171; } }
+.dl { display: inline-flex; align-items: center; gap: 6px; font: 600 14px var(--body); padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--board); color: var(--ink); cursor: pointer; }
+.dl:hover { border-color: var(--brand); }
+.dl:disabled { opacity: .6; cursor: wait; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   .podium { grid-template-columns: 1fr; }
@@ -170,6 +178,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
     <div class="panel">
       <div class="panel-head">
         <h2>Club teams leaderboard</h2>
+        <button class="dl" id="tileClubs" type="button" title="Download an image of the standings for social media">⤓ Download image</button>
         <div class="legend"><span><span class="sw"></span><span id="countLegend">Counts toward total</span></span><span>– did not play</span></div>
       </div>
       <div class="scroll"><table id="clubTable"></table></div>
@@ -184,6 +193,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 30px; }
         <div class="controls">
           <label class="ctl" for="clubFilter">Club<select id="clubFilter"><option value="">All clubs</option></select></label>
           <label class="ctl" for="search">Find a player<input type="search" id="search" placeholder="Type a name"></label>
+          <button class="dl" id="tilePlayers" type="button" title="Download an image of the top 10 for social media">⤓ Top 10 image</button>
         </div>
       </div>
       <div class="scroll"><table id="playerTable"></table></div>
@@ -244,7 +254,7 @@ getJSON("data/leaderboard.json").then(CUR => {
   document.querySelector("main").innerHTML = '<div class="panel"><p class="empty">The leaderboard data could not be loaded (' + err.message + '). Try refreshing the page.</p></div>';
 });
 // ---- scoring: shared by the leaderboard and the history tab
-function compute(D) {
+function compute(D, upto) {   // upto: only count rounds up to this index (for "since last round" movement)
   const S = D.settings, R = D.rounds;
   const clubInfo = new Map(D.clubs.map(c => [c.name, c]));
   // ---- clean results
@@ -252,6 +262,7 @@ function compute(D) {
   for (const [round, player, club, holes, pts] of D.results) {
     const rd = R.find(r => r.n === round);
     if (!rd || rd.cancelled || !clubInfo.has(club) || typeof pts !== "number") continue;
+    if (upto !== undefined && R.indexOf(rd) > upto) continue;
     const k = round + "|" + player + "|" + club; if (seen.has(k)) continue; seen.add(k);
     rows.push({ round, player, club, holes, raw: pts, score: pts + (holes === 9 ? S.nineHoleAdd : 0) });
   }
@@ -310,6 +321,27 @@ function render(D, CUR) {
   // ---- clubs and logos (current club list first, so logos added later also show on past seasons)
   const clubInfo = new Map([...D.clubs, ...CUR.clubs].map(c => [c.name, c]));
   const { rows, played, clubs, eligible, shared, others, players, ptie } = compute(D);
+
+  // ---- movement since the previous round played
+  const playedIdx = played.map((p, i) => (p ? i : -1)).filter(i => i >= 0);
+  const prevC = new Map(), prevP = new Map();
+  let prevLabel = "";
+  if (playedIdx.length >= 2) {
+    const pi = playedIdx[playedIdx.length - 2], prev = compute(D, pi);
+    prev.eligible.forEach(c => prevC.set(c.name, c.pos));
+    prev.players.forEach(p => prevP.set(p.player + "|" + p.club, p.pos));
+    prevLabel = "Round " + R[pi].n;
+  }
+  const move = (before, now) => {
+    if (!prevLabel) return { k: "", d: 0 };
+    if (before === undefined) return { k: "new", d: 0 };
+    return { k: before > now ? "up" : before < now ? "down" : "same", d: Math.abs(before - now) };
+  };
+  const mvHtml = m => !m.k ? "" : m.k === "new" ? '<span class="mv new" title="First time in the standings">NEW</span>'
+    : m.k === "same" ? '<span class="mv same" title="No change since ' + prevLabel + '">–</span>'
+    : '<span class="mv ' + m.k + '" title="' + (m.k === "up" ? "Up " : "Down ") + m.d + " since " + prevLabel + '">' + (m.k === "up" ? "▲" : "▼") + m.d + "</span>";
+  eligible.forEach(c => (c.move = move(prevC.get(c.name), c.pos)));
+  players.forEach(p => (p.move = move(prevP.get(p.player + "|" + p.club), p.pos)));
   const initials = name => name.replace(/\b(golf|club|links|gc)\b/gi, "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
   const logo = (club, cls) => { const c = clubInfo.get(club); return c && c.logo ? '<img class="logo ' + (cls || "") + '" src="' + esc(c.logo) + '" alt="" loading="lazy">' : '<span class="logo ' + (cls || "") + '" aria-hidden="true">' + esc(initials(club)) + "</span>"; };
 
@@ -364,14 +396,14 @@ function render(D, CUR) {
     if (!b.total) return '<td class="dash">–</td>';
     return '<td class="' + (c.counted.has(i) ? "count" : "") + '" title="' + esc(b.top.map(t => t.player + " " + t.score).join(", ")) + '">' + b.total + "</td>";
   };
-  const clubRow = (c, posText) => '<tr><td class="pos sticky">' + posText + '</td><td class="sticky2"><span class="crestcell">' + logo(c.name) + '<span class="cname">' + esc(c.name) + '</span></span></td><td class="total">' + c.total + "</td><td>" + c.events + "</td>" + R.map((r, i) => cell(c, i)).join("") + "</tr>";
+  const clubRow = (c, posText) => '<tr><td class="pos sticky"><span class="pn">' + posText + "</span>" + (c.bop ? mvHtml(c.move) : "") + '</td><td class="sticky2"><span class="crestcell">' + logo(c.name) + '<span class="cname">' + esc(c.name) + '</span></span></td><td class="total">' + c.total + "</td><td>" + c.events + "</td>" + R.map((r, i) => cell(c, i)).join("") + "</tr>";
   const cols = R.length + 4;
   document.getElementById("clubTable").innerHTML =
     '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left sticky2" scope="col">Club</th><th scope="col">Total</th><th scope="col">Events</th>' + roundHead() + "</tr></thead><tbody>" +
     eligible.map(c => clubRow(c, (shared.has(c.pos) ? "T" : "") + c.pos)).join("") +
     (others.length ? '<tr class="sep"><td colspan="' + cols + '">Not eligible for the trophy</td></tr>' + others.map(c => clubRow(c, '<span class="ne">n/e</span>')).join("") : "") +
     (eligible.length ? "" : '<tr><td colspan="' + cols + '" class="empty">No results yet. Standings appear after the first event.</td></tr>') + "</tbody>";
-  document.getElementById("clubNote").textContent = "Each event score is the club's best " + S.perClub + " individual scores. Hover over a score to see who counted, or open Event results. Only Bay of Plenty clubs can win the trophy.";
+  document.getElementById("clubNote").textContent = (prevLabel ? "Arrows show movement since " + prevLabel + ". " : "") + "Each event score is the club's best " + S.perClub + " individual scores. Hover over a score to see who counted, or open Event results. Only Bay of Plenty clubs can win the trophy.";
 
   // ---- players
   const clubSel = document.getElementById("clubFilter");
@@ -382,7 +414,7 @@ function render(D, CUR) {
     const list = players.filter(p => (!c || p.club === c) && (!q || p.player.toLowerCase().includes(q)));
     document.getElementById("playerTable").innerHTML =
       '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left sticky2" scope="col">Player</th><th scope="col">Total</th><th scope="col" title="Events played">Ev</th><th scope="col" title="Position within their club">Club pos</th>' + roundHead() + "</tr></thead><tbody>" +
-      (list.length ? list.map(p => '<tr><td class="pos sticky">' + (ptie.has(p.pos) ? "T" : "") + p.pos + '</td><td class="sticky2"><span class="who">' + logo(p.club, "sm") + "<span><b>" + esc(p.player) + "</b><small>" + esc(p.club) + '</small></span></span></td><td class="total">' + p.total + "</td><td>" + p.events + "</td><td>" + p.cpos + "</td>" +
+      (list.length ? list.map(p => '<tr><td class="pos sticky"><span class="pn">' + (ptie.has(p.pos) ? "T" : "") + p.pos + "</span>" + mvHtml(p.move) + '</td><td class="sticky2"><span class="who">' + logo(p.club, "sm") + "<span><b>" + esc(p.player) + "</b><small>" + esc(p.club) + '</small></span></span></td><td class="total">' + p.total + "</td><td>" + p.events + "</td><td>" + p.cpos + "</td>" +
         p.scores.map((v, i) => R[i].cancelled ? '<td class="cx">CANC</td>' : v === null ? '<td class="dash">' + (played[i] ? "–" : "") + "</td>" : "<td>" + v + "</td>").join("") + "</tr>").join("")
         : '<tr><td colspan="' + (R.length + 5) + '" class="empty">No players match. Try another name or club.</td></tr>') + "</tbody>";
   }
@@ -437,6 +469,94 @@ function render(D, CUR) {
     ex.map(e => "<tr><td>" + e.round + '</td><td class="left">' + esc(e.player) + '</td><td class="left">' + esc(e.club) + "</td><td>" + e.points + '</td><td class="left">' + esc(e.source) + "</td></tr>").join("") + "</tbody></table></div>" +
     '<p class="note"><strong>Results per source</strong></p><ul class="note">' +
     R.map(r => "<li>Round " + r.n + ": " + (r.cancelled ? "cancelled" : (r.sources || []).map(s => esc(s.label) + " – " + s.count + " results").join("; ") || "no sources yet") + "</li>").join("") + "</ul>";
+
+  // ---- social media tile (1080 x 1350, Instagram portrait)
+  const WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen"];
+  const lastIdx = playedIdx.length ? playedIdx[playedIdx.length - 1] : -1;
+  const stageText = D.status === "Final" ? "Final standings" : lastIdx >= 0 ? "After Round " + (WORDS[R[lastIdx].n] || R[lastIdx].n) : "Season preview";
+  const loadImg = src => new Promise(ok => { if (!src) return ok(null); const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  async function makeTile(kind) {
+    const W = 1080, H = 1350, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const g = cv.getContext("2d");
+    try { await Promise.all([document.fonts.load('700 60px "Barlow Condensed"'), document.fonts.load('600 30px "Barlow Condensed"'), document.fonts.load('400 30px "Source Sans 3"')]); } catch (e) {}
+    const brand = cssVar("--brand") || "#12432f", accent = cssVar("--accent") || "#e7b93c", onBrand = cssVar("--on-brand") || "#fff";
+    const disp = w => w + ' "Barlow Condensed", "Arial Narrow", Arial, sans-serif', body = w => w + ' "Source Sans 3", Arial, sans-serif';
+    // background
+    const bg = await loadImg(B.tile_bg);
+    if (bg) {
+      const sc = Math.max(W / bg.width, H / bg.height), bw = bg.width * sc, bh = bg.height * sc;
+      g.drawImage(bg, (W - bw) / 2, (H - bh) / 2, bw, bh); g.fillStyle = "rgba(0,0,0,0.28)"; g.fillRect(0, 0, W, H);
+    } else {
+      const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, brand); gr.addColorStop(1, "#0b0f14"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    }
+    // header band
+    const HB = 200; g.fillStyle = brand; g.fillRect(0, 0, W, HB);
+    g.fillStyle = accent; g.fillRect(0, HB - 8, W, 8);
+    g.textBaseline = "alphabetic"; g.fillStyle = onBrand;
+    let tsize = 78; g.font = disp("700 " + tsize + "px"); const title = B.tile_title || (D.title || "Top of the Harbour");
+    while (g.measureText(title).width > W - 200 && tsize > 40) { tsize -= 2; g.font = disp("700 " + tsize + "px"); }
+    g.fillText(title, 100, 96);
+    g.font = disp("600 40px"); g.fillStyle = accent; g.fillText((kind === "clubs" ? "CLUB LEADERBOARD" : "INDIVIDUAL LEADERBOARD") + "  ·  " + D.season, 102, 144);
+    g.font = body("400 28px"); g.fillStyle = onBrand; g.globalAlpha = 0.9; g.fillText(stageText, 102, 178); g.globalAlpha = 1;
+    // rows
+    const FB = 130, top = HB + 22, bottom = H - FB - 18;
+    const items = kind === "clubs" ? eligible.map(c => ({ name: c.name, club: c.name, pts: c.total, pos: c.pos, move: c.move }))
+      : players.slice(0, 10).map(p => ({ name: p.player.includes(",") ? p.player.split(",").slice(1).join(",").trim() + " " + p.player.split(",")[0].trim() : p.player, sub: p.club, club: p.club, pts: p.total, pos: p.pos, move: p.move }));
+    const n = Math.max(items.length, 1), gap = n > 12 ? 8 : 12, rh = Math.min(kind === "clubs" ? 68 : 86, (bottom - top - gap * (n - 1)) / n);
+    const logos = await Promise.all(items.map(it => { const c = clubInfo.get(it.club); return loadImg(c && c.logo); }));
+    const L = 100, R2 = W - 100, MED = [["#F9D71C", "#141414"], ["#CDD2D6", "#141414"], ["#8E3B3B", "#ffffff"]];
+    items.forEach((it, i) => {
+      const y = top + i * (rh + gap), big = it.pos <= 3 && i < 3, x0 = big ? L : L + 8, x1 = big ? R2 : R2 - 8;
+      const [fill, ink] = big ? MED[it.pos - 1] || MED[2] : ["rgba(8,8,8,0.88)", "#ffffff"];
+      g.fillStyle = fill; g.beginPath(); g.roundRect(x0, y, x1 - x0, rh, rh / 2); g.fill();
+      const cy = y + rh / 2;
+      // arrow
+      const ax = x0 + 46, m = it.move || {};
+      if (m.k === "up" || m.k === "down") {
+        const up = m.k === "up", s2 = Math.min(rh * 0.26, 18); g.fillStyle = up ? "#22c55e" : "#ef4444"; g.beginPath();
+        if (up) { g.moveTo(ax, cy - s2); g.lineTo(ax + s2, cy); g.lineTo(ax + s2 * 0.4, cy); g.lineTo(ax + s2 * 0.4, cy + s2); g.lineTo(ax - s2 * 0.4, cy + s2); g.lineTo(ax - s2 * 0.4, cy); g.lineTo(ax - s2, cy); }
+        else { g.moveTo(ax, cy + s2); g.lineTo(ax + s2, cy); g.lineTo(ax + s2 * 0.4, cy); g.lineTo(ax + s2 * 0.4, cy - s2); g.lineTo(ax - s2 * 0.4, cy - s2); g.lineTo(ax - s2 * 0.4, cy); g.lineTo(ax - s2, cy); }
+        g.closePath(); g.fill();
+      } else if (m.k) { g.fillStyle = ink; g.fillRect(ax - 12, cy - 2.5, 24, 5); }
+      // logo
+      const lr = Math.min(rh * 0.36, 26), lx = x0 + 104;
+      g.save(); g.beginPath(); g.arc(lx, cy, lr, 0, Math.PI * 2); g.fillStyle = "#ffffff"; g.fill(); g.clip();
+      if (logos[i]) { const im = logos[i], sc = Math.min((lr * 1.8) / im.width, (lr * 1.8) / im.height); g.drawImage(im, lx - (im.width * sc) / 2, cy - (im.height * sc) / 2, im.width * sc, im.height * sc); }
+      else { g.fillStyle = brand; g.font = disp("700 " + Math.round(lr * 0.9) + "px"); g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(it.club.replace(/\b(golf|club|links|gc)\b/gi, "").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase(), lx, cy + 1); g.textAlign = "left"; g.textBaseline = "alphabetic"; }
+      g.restore();
+      // name and points
+      const nx = lx + lr + 22; g.fillStyle = ink;
+      let fs = Math.round(rh * (big ? 0.6 : 0.52)); g.font = disp("700 " + fs + "px"); const maxW = x1 - 230 - nx;
+      while (g.measureText(it.name).width > maxW && fs > 18) { fs--; g.font = disp("700 " + fs + "px"); }
+      if (it.sub) { g.fillText(it.name, nx, cy + fs * 0.05); g.font = body("400 " + Math.round(rh * 0.24) + "px"); g.globalAlpha = 0.8; g.fillText(it.sub, nx, cy + rh * 0.34); g.globalAlpha = 1; }
+      else { g.textBaseline = "middle"; g.fillText(it.name, nx, cy + 2); g.textBaseline = "alphabetic"; }
+      g.textAlign = "right"; g.textBaseline = "middle"; g.font = disp("600 " + Math.round(rh * (big ? 0.56 : 0.46)) + "px"); g.fillText(it.pts + " pts", x1 - 40, cy + 2);
+      g.textAlign = "left"; g.textBaseline = "alphabetic";
+    });
+    if (!items.length) { g.fillStyle = "#fff"; g.font = disp("600 48px"); g.textAlign = "center"; g.fillText("Standings appear after the first event", W / 2, H / 2); g.textAlign = "left"; }
+    // footer with logos
+    g.fillStyle = brand; g.fillRect(0, H - FB, W, FB);
+    const marks = (await Promise.all([B.logo, ...(CUR.sponsors || []).map(x => x.logo)].filter(Boolean).slice(0, 5).map(loadImg))).filter(Boolean);
+    if (marks.length) {
+      const mh = 84, sizes = marks.map(im => Math.min(220, (im.width / im.height) * mh)), gapL = 70, tot = sizes.reduce((a, b) => a + b, 0) + gapL * (marks.length - 1);
+      let x = (W - tot) / 2; marks.forEach((im, i) => { const w = sizes[i], h = (im.height / im.width) * w; g.drawImage(im, x, H - FB / 2 - h / 2, w, h); x += w + gapL; });
+    } else { g.fillStyle = onBrand; g.font = body("600 28px"); g.textAlign = "center"; g.fillText(B.eyebrow || "", W / 2, H - FB / 2 + 10); g.textAlign = "left"; }
+    return cv;
+  }
+  async function downloadTile(kind, btn) {
+    const old = btn.textContent; btn.disabled = true; btn.textContent = "Making image…";
+    try {
+      const cv = await makeTile(kind);
+      const blob = await new Promise(ok => cv.toBlob(ok, "image/png"));
+      const name = (D.season + "-top-of-the-harbour-" + (kind === "clubs" ? "clubs" : "top-10") + "-" + stageText.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png").replace(/-+/g, "-");
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    } catch (e) { alert("Sorry, the image couldn't be made: " + e.message); }
+    finally { btn.disabled = false; btn.textContent = old; }
+  }
+  document.getElementById("tileClubs").addEventListener("click", ev => downloadTile("clubs", ev.currentTarget));
+  document.getElementById("tilePlayers").addEventListener("click", ev => downloadTile("players", ev.currentTarget));
 
   // ---- history
   let historyDone = false;

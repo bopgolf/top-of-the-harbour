@@ -249,8 +249,24 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
       <div class="row" style="margin-top:12px"><button class="ghost" id="addSp">Add a sponsor</button><button id="saveSp">Save sponsors</button><span class="muted" id="spMsg"></span></div>
     </div>
   </div>
+  <div class="panel">
+    <h2>Social media image</h2>
+    <div class="pad">
+      <p class="hint">The leaderboard's <strong>Download image</strong> buttons make a ready-to-post picture of the standings (1080 × 1350, the shape Instagram and Facebook use). It uses your colours, club logos, your logo and sponsor logos. Here you can set its title and a background photo, e.g. a course shot; without one, the background is a gradient in your main colour.</p>
+      <div class="grid">
+        <label class="wide" for="tTitle">Title on the image<input id="tTitle" placeholder="Top of the Harbour Tour"></label>
+        <div class="wide row" style="gap:14px">
+          <span id="tPrev" style="display:inline-grid;place-items:center;width:96px;height:120px;border-radius:8px;border:1px solid var(--line);overflow:hidden;background:var(--stripe);font-size:12px" class="muted"></span>
+          <label style="display:inline-block;border:1px solid var(--line);border-radius:7px;padding:8px 14px;cursor:pointer;color:var(--ink);font-weight:600">Upload background photo<input type="file" id="tFile" accept="image/png,image/jpeg,image/webp" hidden></label>
+          <button class="danger" id="tRemove" hidden>Remove photo</button>
+        </div>
+        <div class="wide row"><button id="tSave">Save title</button><a href="./#clubs" target="_blank" rel="noopener">Try it on the leaderboard ↗</a><span class="muted" id="tMsg"></span></div>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- (social tile panel lives in the Look tab, below) -->
 <!-- ============ HISTORY ============ -->
 <section id="v-history" hidden>
   <div class="panel">
@@ -619,14 +635,14 @@ function renderClubs() {
       <td><button class="danger" data-rm="${i}">Remove</button></td></tr>`).join("") + "</tbody>";
 }
 const logoPreview = {};
-async function shrink(file, max) {
+async function shrink(file, max, type) {
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise((ok, bad) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => bad(new Error("That file isn't an image we can read. Try a PNG or JPG.")); im.src = url; });
     max = max || 200; const sc = Math.min(1, max / Math.max(img.naturalWidth || max, img.naturalHeight || max));
     const w = Math.max(1, Math.round((img.naturalWidth || max) * sc)), h = Math.max(1, Math.round((img.naturalHeight || max) * sc));
     const cv = document.createElement("canvas"); cv.width = w; cv.height = h; cv.getContext("2d").drawImage(img, 0, 0, w, h);
-    return cv.toDataURL("image/png");
+    return cv.toDataURL(type || "image/png", 0.86);
   } finally { URL.revokeObjectURL(url); }
 }
 $("clubsTable").addEventListener("change", async ev => {
@@ -734,6 +750,24 @@ $("saveSp").addEventListener("click", ev => busy(ev.target, async () => {
   const bad = t.rows.find(x => x.link && !/^https?:\/\//i.test(x.link)); if (bad) { toast("The link for " + bad.name + " needs to start with https://", true); return; }
   await saveTable("sponsors.csv", "Update sponsors (organiser page)"); toast(savedMsg); $("spMsg").textContent = ""; renderLook();
 }));
+
+// ---------------------------------------------------------------- social tile settings
+function renderTile() {
+  $("tTitle").value = setting("tile_title");
+  const bg = imgPreview.tile || setting("tile_background");
+  $("tPrev").innerHTML = bg ? '<img src="' + esc(bg) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : "No photo";
+  $("tRemove").hidden = !bg;
+}
+$("tFile").addEventListener("change", async ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  try {
+    const d = await shrink(f, 1400, "image/jpeg"); await putImage("logos/tile-background.jpg", d, "Social image background (organiser page)");
+    imgPreview.tile = d; setSetting("tile_background", "logos/tile-background.jpg"); await saveTable("settings.csv", "Use social image background (organiser page)");
+    toast("Photo saved. It's used for downloaded images in about 2 minutes."); renderTile();
+  } catch (e) { toast(e.status ? explain(e) : e.message, true); } finally { ev.target.value = ""; }
+});
+$("tRemove").addEventListener("click", ev => busy(ev.target, async () => { setSetting("tile_background", ""); delete imgPreview.tile; await saveTable("settings.csv", "Remove social image background (organiser page)"); toast(savedMsg); renderTile(); }));
+$("tSave").addEventListener("click", ev => busy(ev.target, async () => { setSetting("tile_title", $("tTitle").value.trim()); await saveTable("settings.csv", "Social image title (organiser page)"); toast(savedMsg); $("tMsg").textContent = "Saved " + new Date().toLocaleTimeString("en-NZ"); }));
 
 // ---------------------------------------------------------------- history
 async function archived(season) { try { await api(repoPath("/contents/data/seasons/" + season + ".json?ref=" + G.branch)); return true; } catch (e) { if (e.status === 404) return false; throw e; } }
@@ -906,7 +940,7 @@ function route() {
   if (v === "history") { renderHistory(); loadPastList(); }
 }
 function render() {
-  renderEvents(); renderFixes(); renderClubs(); renderSettings(); fillClubSelect(); fixFormState(); renderLook();
+  renderEvents(); renderFixes(); renderClubs(); renderSettings(); fillClubSelect(); fixFormState(); renderLook(); renderTile();
   $("uRound").innerHTML = rounds().map(r => `<option value="${esc(r.round)}">Round ${esc(r.round)} – ${esc(r.event)}</option>`).join("");
   $("players").innerHTML = known.players.map(p => `<option value="${esc(p)}">`).join("");
 }
