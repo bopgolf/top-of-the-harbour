@@ -252,7 +252,17 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
   <div class="panel">
     <h2>Social media image</h2>
     <div class="pad">
-      <p class="hint">The leaderboard's <strong>Download image</strong> buttons make a ready-to-post picture of the standings (1080 × 1350, the shape Instagram and Facebook use). It uses your colours, club logos, your logo and sponsor logos. Here you can set its title and a background photo, e.g. a course shot; without one, the background is a gradient in your main colour.</p>
+      <p class="hint">Make a ready-to-post picture of the standings (1080 × 1350, the shape Instagram and Facebook use) with your colours, club logos, your logo and sponsor logos. Only signed-in organisers can make these.</p>
+      <div class="grid">
+        <label for="mSeason">Season<select id="mSeason"></select></label>
+        <label for="mRound">Standings after<select id="mRound"><option>Loading…</option></select></label>
+        <label for="mKind">Image<select id="mKind"><option value="clubs">Club leaderboard</option><option value="players">Top 10 individuals</option></select></label>
+        <div class="wide row"><button id="mMake">Show preview</button><button class="ghost" id="mDl" disabled>Download image</button><span class="muted" id="mMsg"></span></div>
+        <div class="wide" id="mPrev" hidden><img id="mImg" alt="Preview of the social media image" style="width:100%;max-width:360px;border-radius:8px;border:1px solid var(--line);display:block"></div>
+      </div>
+      <iframe id="mFrame" title="Leaderboard used to draw the image" aria-hidden="true" tabindex="-1" style="position:absolute;left:-10000px;top:0;width:1300px;height:900px;border:0;visibility:hidden"></iframe>
+      <h3 style="font:700 18px var(--display);margin:20px 0 6px">Title and background</h3>
+      <p class="hint">Set the title shown on the image and an optional background photo, e.g. a course shot. Without a photo, the background is a gradient in your main colour.</p>
       <div class="grid">
         <label class="wide" for="tTitle">Title on the image<input id="tTitle" placeholder="Top of the Harbour Tour"></label>
         <div class="wide row" style="gap:14px">
@@ -260,7 +270,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
           <label style="display:inline-block;border:1px solid var(--line);border-radius:7px;padding:8px 14px;cursor:pointer;color:var(--ink);font-weight:600">Upload background photo<input type="file" id="tFile" accept="image/png,image/jpeg,image/webp" hidden></label>
           <button class="danger" id="tRemove" hidden>Remove photo</button>
         </div>
-        <div class="wide row"><button id="tSave">Save title</button><a href="./#clubs" target="_blank" rel="noopener">Try it on the leaderboard ↗</a><span class="muted" id="tMsg"></span></div>
+        <div class="wide row"><button id="tSave">Save title</button><span class="muted" id="tMsg"></span></div>
       </div>
     </div>
   </div>
@@ -769,6 +779,44 @@ $("tFile").addEventListener("change", async ev => {
 $("tRemove").addEventListener("click", ev => busy(ev.target, async () => { setSetting("tile_background", ""); delete imgPreview.tile; await saveTable("settings.csv", "Remove social image background (organiser page)"); toast(savedMsg); renderTile(); }));
 $("tSave").addEventListener("click", ev => busy(ev.target, async () => { setSetting("tile_title", $("tTitle").value.trim()); await saveTable("settings.csv", "Social image title (organiser page)"); toast(savedMsg); $("tMsg").textContent = "Saved " + new Date().toLocaleTimeString("en-NZ"); }));
 
+// ---------------------------------------------------------------- social image maker
+let mReady = null, mBlob = null, mName = "";
+async function loadSeasons() {
+  try {
+    const d = await fetch("data/leaderboard.json", { cache: "no-store" }).then(r => r.json());
+    const ys = [String(d.season), ...(d.archive || []).map(String).filter(y => y !== String(d.season))];
+    $("mSeason").innerHTML = ys.map((y, i) => `<option value="${y}" data-cur="${i === 0 ? 1 : 0}">${y}${i === 0 ? " (current)" : ""}</option>`).join("");
+    loadFrame();
+  } catch (e) { $("mMsg").textContent = "The leaderboard data couldn't be loaded."; }
+}
+function loadFrame() {
+  const o = $("mSeason").selectedOptions[0]; if (!o) return;
+  $("mRound").innerHTML = "<option>Loading…</option>"; $("mDl").disabled = true; $("mPrev").hidden = true; mBlob = null;
+  mReady = new Promise((ok, bad) => {
+    const f = $("mFrame"); let tries = 0;
+    f.onload = () => { const t = setInterval(() => { const T = f.contentWindow && f.contentWindow.TOTH; if (T) { clearInterval(t); ok(T); } else if (++tries > 100) { clearInterval(t); bad(new Error("the leaderboard didn't load")); } }, 100); };
+    f.src = (o.dataset.cur === "1" ? "./" : "./?season=" + encodeURIComponent(o.value)) + "#clubs";
+  });
+  mReady.then(T => {
+    $("mRound").innerHTML = T.rounds.length ? '<option value="">Latest (Round ' + T.rounds[T.rounds.length - 1].n + ")</option>" + T.rounds.slice(0, -1).reverse().map(r => `<option value="${r.idx}">Round ${r.n} – ${esc(r.event)}</option>`).join("")
+      : '<option value="">No results yet</option>';
+  }).catch(e => ($("mMsg").textContent = "Couldn't load: " + e.message));
+}
+$("mSeason").addEventListener("change", loadFrame);
+["mRound", "mKind"].forEach(id => $(id).addEventListener("change", () => { $("mDl").disabled = true; mBlob = null; $("mMsg").textContent = "Click Show preview to update."; }));
+$("mMake").addEventListener("click", ev => busy(ev.target, async () => {
+  $("mMsg").textContent = "Making image…";
+  const T = await mReady, v = $("mRound").value;
+  const { canvas, name } = await T.image($("mKind").value, v === "" ? undefined : +v);
+  mBlob = await new Promise(ok => canvas.toBlob(ok, "image/png")); mName = name;
+  $("mImg").src = URL.createObjectURL(mBlob); $("mPrev").hidden = false; $("mDl").disabled = false; $("mMsg").textContent = "";
+}));
+$("mDl").addEventListener("click", () => {
+  if (!mBlob) return;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(mBlob); a.download = mName; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+});
+
 // ---------------------------------------------------------------- history
 async function archived(season) { try { await api(repoPath("/contents/data/seasons/" + season + ".json?ref=" + G.branch)); return true; } catch (e) { if (e.status === 404) return false; throw e; } }
 async function renderHistory() {
@@ -940,7 +988,7 @@ function route() {
   if (v === "history") { renderHistory(); loadPastList(); }
 }
 function render() {
-  renderEvents(); renderFixes(); renderClubs(); renderSettings(); fillClubSelect(); fixFormState(); renderLook(); renderTile();
+  renderEvents(); renderFixes(); renderClubs(); renderSettings(); fillClubSelect(); fixFormState(); renderLook(); renderTile(); if (!mReady) loadSeasons();
   $("uRound").innerHTML = rounds().map(r => `<option value="${esc(r.round)}">Round ${esc(r.round)} – ${esc(r.event)}</option>`).join("");
   $("players").innerHTML = known.players.map(p => `<option value="${esc(p)}">`).join("");
 }
