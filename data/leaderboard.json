@@ -146,7 +146,9 @@
  "brand": {
   "logo": "logos/brand-logo.png",
   "eyebrow": "Top of the Harbour Tour | Bay of Plenty Futures Opens",
-  "intro": "Clubs compete as teams across the junior and Futures opens. The best three stableford scores from each club count at every event, and each club's best seven events make up its season total."
+  "intro": "Clubs compete as teams across the junior and Futures opens. The best three stableford scores from each club count at every event, and each club's best seven events make up its season total.",
+  "tile_bg": "",
+  "tile_title": ""
  },
  "sponsors": [
   {
@@ -346,6 +348,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "f47032016ad2e350547376196ce8b9758cdd7f5e066a8feb46c450c592cad0df",
- "updated": "2026-11-16T20:37+00:00"
+ "digest": "894d73b34d9352d7dfdecdf2a433593ec681c3932f20cdc5d0f253c737af963a",
+ "updated": "2026-11-20T01:26+00:00"
 }
