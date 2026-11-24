@@ -3,7 +3,7 @@ name: Update leaderboard
 on:
   schedule:
     - cron: "17 */3 * * *"      # every 3 hours (UTC)
-  workflow_dispatch:            # "Run workflow" button on the Actions tab
+  workflow_dispatch:            # "Run workflow" button / organiser page "Update now"
   push:
     branches: [main]
     paths:
@@ -23,17 +23,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  update:
+  # 1. Fetch results, rebuild the data and package the website
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: main          # always start from the latest version
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -60,9 +58,17 @@ jobs:
 
       - uses: actions/configure-pages@v5
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
+  # 2. Publish the packaged website
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - id: deploy
         uses: actions/deploy-pages@v4
