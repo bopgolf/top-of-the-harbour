@@ -267,6 +267,7 @@ def main():
         "perClub": to_int(settings.get("scores_per_club"), 3),
         "bestEvents": to_int(settings.get("best_events"), 6),
         "nineHoleAdd": to_int(settings.get("nine_hole_add"), 17),
+        "indBest": to_int(settings.get("individual_best_events"), 0),   # 0 = every event counts
     }
     rounds_in = read_csv("rounds.csv")
     clubs_in = read_csv("clubs.csv")
