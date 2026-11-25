@@ -399,11 +399,61 @@
    "name": "Wairakei Resort",
    "bop": true,
    "logo": ""
+  },
+  {
+   "name": "Waihi Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Paeroa Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Te Aroha Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Hauraki Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Coromandel Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Mercury Bay Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Pauanui Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Tairua Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Thames Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Whanagamata Golf Club",
+   "bop": true,
+   "logo": ""
   }
  ],
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "d75f240e7a08ff340af1a2f4bb85860ae472d13159df3d07906398bcbd1ff35e",
- "updated": "2026-11-25T20:44+00:00"
+ "digest": "cec6ce6183321ae531b5c0a9cf5b2e9da961f8055fdbbb6418d0d8f075874e91",
+ "updated": "2026-11-25T21:00+00:00"
 }
