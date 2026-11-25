@@ -189,6 +189,7 @@ td.pos .pn { display: block; line-height: 1; }
     <div class="panel">
       <div class="panel-head">
         <h2>Individual leaderboard</h2>
+        <div class="legend" id="indLegend" hidden><span><span class="sw"></span><span id="indLegendText">Counts toward total</span></span><span>– did not play</span></div>
         <div class="controls">
           <label class="ctl" for="clubFilter">Club<select id="clubFilter"><option value="">All clubs</option></select></label>
           <label class="ctl" for="search">Find a player<input type="search" id="search" placeholder="Type a name"></label>
@@ -295,9 +296,21 @@ function compute(D, upto) {   // upto: only count rounds up to this index (for "
     if (!pmap.has(k)) pmap.set(k, { player: x.player, club: x.club, scores: Array(R.length).fill(null) });
     pmap.get(k).scores[R.findIndex(r => r.n === x.round)] = x.score;
   }
-  const players = [...pmap.values()].map(p => ({ ...p, total: p.scores.reduce((s, v) => s + (v || 0), 0), events: p.scores.filter(v => v !== null).length }));
-  players.forEach(p => { p.pos = 1 + players.filter(o => o.total > p.total).length; p.cpos = 1 + players.filter(o => o.club === p.club && o.total > p.total).length; });
-  players.sort((a, b) => b.total - a.total || a.player.localeCompare(b.player));
+  // individual total: every round, or the best N rounds when the season sets one (S.indBest)
+  const indBest = S.indBest > 0 ? S.indBest : 0;
+  const players = [...pmap.values()].map(p => {
+    const sc = p.scores.map((v, i) => ({ v, i })).filter(x => x.v !== null).sort((a, b) => b.v - a.v || a.i - b.i);
+    const use = indBest ? sc.slice(0, indBest) : sc, spare = indBest ? sc.slice(indBest).map(x => x.v) : [];
+    return { ...p, counted: new Set(use.map(x => x.i)), total: use.reduce((s, x) => s + x.v, 0), spare, events: sc.length, best: sc.length ? sc[0].v : 0 };
+  });
+  // ties (series rules): next-best score not counted, then most events played, then best single round, then shared
+  const pcmp = (a, b) => {
+    if (b.total !== a.total) return b.total - a.total;
+    for (let k = 0; k < Math.max(a.spare.length, b.spare.length); k++) { const d = (b.spare[k] || 0) - (a.spare[k] || 0); if (d) return d; }
+    return b.events - a.events || b.best - a.best;
+  };
+  players.forEach(p => { p.pos = 1 + players.filter(o => pcmp(o, p) < 0).length; p.cpos = 1 + players.filter(o => o.club === p.club && pcmp(o, p) < 0).length; });
+  players.sort((a, b) => pcmp(a, b) || a.player.localeCompare(b.player));
   const ptie = new Set(players.map(p => p.pos).filter((p, i, a) => a.indexOf(p) !== i));
   return { rows, played, clubs, eligible, shared, others, players, ptie };
 }
@@ -413,13 +426,15 @@ function render(D, CUR) {
     document.getElementById("playerTable").innerHTML =
       '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left sticky2" scope="col">Player</th><th scope="col">Total</th><th scope="col" title="Events played">Ev</th><th scope="col" title="Position within their club">Club pos</th>' + roundHead() + "</tr></thead><tbody>" +
       (list.length ? list.map(p => '<tr><td class="pos sticky"><span class="pn">' + (ptie.has(p.pos) ? "T" : "") + p.pos + "</span>" + mvHtml(p.move) + '</td><td class="sticky2"><span class="who">' + logo(p.club, "sm") + "<span><b>" + esc(p.player) + "</b><small>" + esc(p.club) + '</small></span></span></td><td class="total">' + p.total + "</td><td>" + p.events + "</td><td>" + p.cpos + "</td>" +
-        p.scores.map((v, i) => R[i].cancelled ? '<td class="cx">CANC</td>' : v === null ? '<td class="dash">' + (played[i] ? "–" : "") + "</td>" : "<td>" + v + "</td>").join("") + "</tr>").join("")
+        p.scores.map((v, i) => R[i].cancelled ? '<td class="cx">CANC</td>' : v === null ? '<td class="dash">' + (played[i] ? "–" : "") + "</td>" : '<td class="' + (S.indBest > 0 && p.counted.has(i) ? "count" : "") + '">' + v + "</td>").join("") + "</tr>").join("")
         : '<tr><td colspan="' + (R.length + 5) + '" class="empty">No players match. Try another name or club.</td></tr>') + "</tbody>";
   }
   clubSel.addEventListener("change", drawPlayers);
   search.addEventListener("input", drawPlayers);
   drawPlayers();
-  document.getElementById("playerNote").textContent = "Scores are 18-hole stableford points; nine-hole scores include the 17 points added under the World Handicap System. Season total is the sum of every round played. Hover over a round heading for the event name.";
+  if (S.indBest > 0) { document.getElementById("indLegend").hidden = false; document.getElementById("indLegendText").textContent = "Counts toward total (best " + S.indBest + " events)"; }
+  document.getElementById("playerNote").textContent = "Scores are 18-hole stableford points; nine-hole scores include the 17 points added under the World Handicap System. " +
+    (S.indBest > 0 ? "Season total is each player's best " + S.indBest + " scores. " : "Season total is the sum of every round played. ") + (S.indBest > 0 ? "Ties are decided by the next-best score that isn't counted, then most events played, then best single round. " : "Ties are decided by most events played, then best single round. ") + "If still tied, positions are shared. " + "Hover over a round heading for the event name.";
 
   // ---- events
   const pick = document.getElementById("roundPick");

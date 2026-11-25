@@ -209,6 +209,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
         <label for="sPer">Scores counting per club per event<input id="sPer" type="number" min="1" max="10"></label>
         <label for="sBest">Events counting toward club total<input id="sBest" type="number" min="1" max="20"></label>
         <label for="sAdd">Points added to 9-hole scores<input id="sAdd" type="number" min="0" max="36"></label>
+        <label for="sInd">Events counting toward individual total<input id="sInd" type="number" min="0" max="20" placeholder="Every event"></label>
         <label for="sHeader">Main colour (header and totals)<input id="sHeader" type="color" style="height:42px;padding:3px"></label>
         <label for="sAccent">Highlight colour (scores that count)<input id="sAccent" type="color" style="height:42px;padding:3px"></label>
         <div class="wide" id="preview" aria-hidden="true" style="border-radius:9px;overflow:hidden;border:1px solid var(--line)">
@@ -299,6 +300,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
           <label for="pPer">Scores counting per club per event<input id="pPer" type="number" min="1" max="10"></label>
           <label for="pBest">Events counting toward club total<input id="pBest" type="number" min="1" max="20"></label>
           <label for="pAdd">Points added to 9-hole scores<input id="pAdd" type="number" min="0" max="36"></label>
+          <label for="pInd">Events counting toward individual total<input id="pInd" type="number" min="0" max="20" placeholder="Every event"></label>
           <label class="wide" for="pNote">Note shown on this season's page (optional)<textarea id="pNote" rows="2" style="font-family:var(--body);font-size:14px"></textarea></label>
         </div>
         <h3 style="font:700 18px var(--display);margin:18px 0 8px">Events</h3>
@@ -681,7 +683,7 @@ $("saveClubs").addEventListener("click", ev => busy(ev.target, async () => {
 function fillClubSelect() { $("fClub").innerHTML = clubNames().map(c => `<option>${esc(c)}</option>`).join(""); }
 
 // ---------------------------------------------------------------- settings
-const SMAP = { sSeason: "season", sTitle: "title", sStatus: "status", sPer: "scores_per_club", sBest: "best_events", sAdd: "nine_hole_add", sHeader: "colour_header", sAccent: "colour_accent" };
+const SMAP = { sSeason: "season", sTitle: "title", sStatus: "status", sPer: "scores_per_club", sBest: "best_events", sAdd: "nine_hole_add", sInd: "individual_best_events", sHeader: "colour_header", sAccent: "colour_accent" };
 const DEFAULTS = { status: "Live", colour_header: "#12432f", colour_accent: "#e7b93c" };
 function renderSettings() { for (const [id, k] of Object.entries(SMAP)) $(id).value = setting(k) || DEFAULTS[k] || ""; preview(); }
 function preview() {
@@ -890,7 +892,7 @@ $("pastPick").addEventListener("change", async ev => {
 });
 function renderPast() {
   const S = P.settings || {};
-  $("pPer").value = S.perClub; $("pBest").value = S.bestEvents; $("pAdd").value = S.nineHoleAdd; $("pNote").value = P.note || "";
+  $("pPer").value = S.perClub; $("pBest").value = S.bestEvents; $("pAdd").value = S.nineHoleAdd; $("pInd").value = S.indBest || ""; $("pNote").value = P.note || "";
   $("pRounds").innerHTML = "<thead><tr><th>Round</th><th>Event</th><th>Short name</th><th>Date</th><th>Cancelled</th><th title='Counts for every club on top of their best events'>Always counts</th></tr></thead><tbody>" +
     P.rounds.map((r, i) => `<tr><td><strong>${r.n}</strong></td><td><input data-pr="${i}" data-k="event" value="${esc(r.event)}"></td><td><input data-pr="${i}" data-k="short" value="${esc(r.short)}" style="width:120px"></td>
       <td><input data-pr="${i}" data-k="date" type="date" value="${esc(r.date)}"></td><td><input data-pr="${i}" data-k="cancelled" type="checkbox" ${r.cancelled ? "checked" : ""} style="width:auto"></td><td><input data-pr="${i}" data-k="always" type="checkbox" ${r.always ? "checked" : ""} style="width:auto"></td></tr>`).join("") + "</tbody>";
@@ -920,7 +922,7 @@ $("pastEditor").addEventListener("input", ev => {
   if (d.pr !== undefined) { const r = P.rounds[+d.pr]; r[d.k] = t.type === "checkbox" ? t.checked : t.value.trim(); if (d.k === "always" && !t.checked) delete r.always; pDirtyNote(); }
   else if (d.rr !== undefined) { const r = P.results[+d.rr], c = +d.c; r[c] = c === 0 || c === 3 || c === 4 ? (parseInt(t.value, 10) || 0) : t.value.trim(); pDirtyNote(); }
   else if (d.pce !== undefined) { P.clubs[+d.pce].bop = t.value !== "No"; pDirtyNote(); }
-  else if (["pPer", "pBest", "pAdd", "pNote"].includes(t.id)) pDirtyNote();
+  else if (["pPer", "pBest", "pAdd", "pInd", "pNote"].includes(t.id)) pDirtyNote();
 });
 $("pastEditor").addEventListener("change", ev => {
   const t = ev.target;
@@ -951,7 +953,7 @@ $("pCancel").addEventListener("click", () => { pDirty = false; $("pastPick").val
 $("pSave").addEventListener("click", ev => busy(ev.target, async () => {
   const bad = P.results.findIndex(r => !r[1] || !P.clubs.some(c => c.name === r[2]) || !(r[4] >= 0));
   if (bad >= 0) { toast("A result in Round " + P.results[bad][0] + " is missing a player name, club or points.", true); $("pFRound").value = String(P.results[bad][0]); $("pFText").value = ""; renderPastResults(); return; }
-  P.settings = { perClub: parseInt($("pPer").value, 10) || 3, bestEvents: parseInt($("pBest").value, 10) || 6, nineHoleAdd: parseInt($("pAdd").value, 10) || 0 };
+  P.settings = { perClub: parseInt($("pPer").value, 10) || 3, bestEvents: parseInt($("pBest").value, 10) || 6, nineHoleAdd: parseInt($("pAdd").value, 10) || 0, indBest: parseInt($("pInd").value, 10) || 0 };
   P.note = $("pNote").value.trim() || null;
   P.results.forEach(r => (r[1] = tidyName(r[1])));
   try { pSha = await save("data/seasons/" + pYear + ".json", JSON.stringify(P), "Edit " + pYear + " season (organiser page)", pSha); }
