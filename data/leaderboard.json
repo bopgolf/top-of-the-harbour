@@ -161,7 +161,7 @@
   "perClub": 3,
   "bestEvents": 7,
   "nineHoleAdd": 17,
-  "indBest": 0
+  "indBest": 7
  },
  "rounds": [
   {
@@ -349,6 +349,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "e72231473528d42307de54f4e4c3cad23c0705954d34974b4dd56ebc647f74f2",
- "updated": "2026-11-25T20:38+00:00"
+ "digest": "05b0edf1194460d5268c94df7cb176ac48ab9eec51f7880e2e848439271c1755",
+ "updated": "2026-11-25T20:40+00:00"
 }
