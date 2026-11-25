@@ -344,11 +344,66 @@
    "name": "Whakatane Golf Club",
    "bop": true,
    "logo": "logos/whakatane-golf-club.png"
+  },
+  {
+   "name": "Hamurana Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Hinehopu Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Kinloch Village Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Lake Rotoiti Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Murupara Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Renner Park Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Summerhill Estate",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Te Teko Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "The Kinloch Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Wairakei International Golf Club",
+   "bop": true,
+   "logo": ""
+  },
+  {
+   "name": "Wairakei Resort",
+   "bop": true,
+   "logo": ""
   }
  ],
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "05b0edf1194460d5268c94df7cb176ac48ab9eec51f7880e2e848439271c1755",
- "updated": "2026-11-25T20:40+00:00"
+ "digest": "d75f240e7a08ff340af1a2f4bb85860ae472d13159df3d07906398bcbd1ff35e",
+ "updated": "2026-11-25T20:44+00:00"
 }
