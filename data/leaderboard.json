@@ -160,7 +160,8 @@
  "settings": {
   "perClub": 3,
   "bestEvents": 7,
-  "nineHoleAdd": 17
+  "nineHoleAdd": 17,
+  "indBest": 0
  },
  "rounds": [
   {
@@ -958,6 +959,6 @@
   "Round 12: Deetlefs, Landré has holes=36; treated as 18.",
   "Round 12: Mohi, Te Mataara-o-Uenukukopako has holes=36; treated as 18."
  ],
- "digest": "2b46018ca52daedea7431267482b492073babd132bf18cb437afbec6510440f2",
- "updated": "2026-11-25T20:13+00:00"
+ "digest": "169ce1ba0a70b5cf77cc6e363f3437b7973cb25730d10a1942844d45267aac66",
+ "updated": "2026-11-25T20:38+00:00"
 }
