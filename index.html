@@ -131,6 +131,22 @@ td.pos .pn { display: block; line-height: 1; }
 .dl { display: inline-flex; align-items: center; gap: 6px; font: 600 14px var(--body); padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--board); color: var(--ink); cursor: pointer; }
 .dl:hover { border-color: var(--brand); }
 .dl:disabled { opacity: .6; cursor: wait; }
+.about-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+.prose { padding: 8px 22px 18px; max-width: 72ch; font-size: 16px; line-height: 1.55; }
+.prose h2 { font: 700 26px/1.15 var(--display); margin: 18px 0 8px; letter-spacing: .01em; text-wrap: balance; }
+.prose h3 { font: 700 19px/1.2 var(--display); margin: 16px 0 6px; }
+.prose p { margin: 0 0 12px; }
+.prose ul { margin: 0 0 12px; padding-left: 22px; } .prose ul ul { margin: 4px 0 4px; }
+.prose li { margin-bottom: 4px; } .prose li::marker { color: var(--figure); }
+.prose a { color: var(--figure); }
+#schedTable td { white-space: normal; text-align: left; vertical-align: top; }
+#schedTable .rn { font: 700 18px var(--display); color: var(--figure); width: 40px; text-align: center; }
+#schedTable small { display: block; color: var(--muted); font-size: 12.5px; }
+.st { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.st.done { background: var(--count-bg); color: var(--count-ink); } .st.next { background: var(--brand); color: var(--on-brand); } .st.cx { background: var(--stripe); color: var(--muted); border: 1px solid var(--line); }
+nav.tabs .sh { display: none; }
+@media (max-width: 640px) { nav.tabs .lg { display: none; } nav.tabs .sh { display: inline; } nav.tabs a { padding: 9px 7px; font-size: 15px; letter-spacing: .02em; } nav.tabs { gap: 0; } }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   .podium { grid-template-columns: 1fr; }
@@ -161,10 +177,11 @@ td.pos .pn { display: block; line-height: 1; }
     <p class="sub" id="subtitle">Clubs compete as teams across the junior and Futures opens. The best three stableford scores from each club count at every event, and each club's best six events make up its season total.</p>
     <div class="meta" id="meta"></div>
     <nav class="tabs" aria-label="Leaderboard views">
-      <a href="#clubs" data-view="clubs">Club teams</a>
-      <a href="#players" data-view="players">Individuals</a>
-      <a href="#events" data-view="events">Event results</a>
+      <a href="#clubs" data-view="clubs"><span class="lg">Club teams</span><span class="sh">Clubs</span></a>
+      <a href="#players" data-view="players"><span class="lg">Individuals</span><span class="sh">Players</span></a>
+      <a href="#events" data-view="events"><span class="lg">Event results</span><span class="sh">Events</span></a>
       <a href="#history" data-view="history">History</a>
+      <a href="#about" data-view="about">About</a>
     </nav>
   </div>
 </header>
@@ -231,6 +248,16 @@ td.pos .pn { display: block; line-height: 1; }
     </div>
   </section>
 
+  <section id="view-about" hidden>
+    <div class="about-grid">
+      <div class="panel"><div class="prose" id="aboutText"></div></div>
+      <div class="panel">
+        <div class="panel-head"><h2 id="schedTitle">Schedule</h2></div>
+        <div class="scroll"><table id="schedTable"></table></div>
+      </div>
+    </div>
+  </section>
+
   <section id="view-check" hidden>
     <div class="panel">
       <div class="panel-head"><h2>Data check</h2><a href="#clubs">Back to the leaderboard</a></div>
@@ -263,7 +290,7 @@ function compute(D, upto) {   // upto: only count rounds up to this index (for "
     if (!rd || rd.cancelled || !clubInfo.has(club) || typeof pts !== "number") continue;
     if (upto !== undefined && R.indexOf(rd) > upto) continue;
     const k = round + "|" + player + "|" + club; if (seen.has(k)) continue; seen.add(k);
-    rows.push({ round, player, club, holes, raw: pts, score: pts + (holes === 9 ? S.nineHoleAdd : 0) });
+    rows.push({ round, player, club, holes, raw: pts, score: pts + (holes === 9 ? S.nineHoleAdd : holes === 11 ? (S.elevenHoleAdd != null ? S.elevenHoleAdd : 13) : 0) });
   }
   const played = R.map(r => !r.cancelled && rows.some(x => x.round === r.n));
 
@@ -466,7 +493,7 @@ function render(D, CUR) {
     field.forEach(x => { x.fpos = 1 + field.filter(o => o.score > x.score).length; });
     const ft = new Set(field.map(x => x.fpos).filter((p, k, a) => a.indexOf(p) !== k));
     document.getElementById("fieldTable").innerHTML = '<thead><tr><th class="sticky" scope="col">Pos</th><th class="left sticky2" scope="col">Player</th><th scope="col">Holes</th><th scope="col">Points</th><th scope="col">Score</th><th></th></tr></thead><tbody>' +
-      field.map(x => '<tr><td class="pos sticky">' + (ft.has(x.fpos) ? "T" : "") + x.fpos + '</td><td class="sticky2"><span class="who">' + logo(x.club, "sm") + "<span><b>" + esc(x.player) + "</b><small>" + esc(x.club) + "</small></span></span></td><td>" + x.holes + "</td><td>" + x.raw + (x.holes === 9 ? " +" + S.nineHoleAdd : "") + '</td><td class="total">' + x.score + "</td><td>" + (counted.has(x.player + "|" + x.club) ? '<span class="pill">Counted</span>' : "") + "</td></tr>").join("") + "</tbody>";
+      field.map(x => '<tr><td class="pos sticky">' + (ft.has(x.fpos) ? "T" : "") + x.fpos + '</td><td class="sticky2"><span class="who">' + logo(x.club, "sm") + "<span><b>" + esc(x.player) + "</b><small>" + esc(x.club) + "</small></span></span></td><td>" + x.holes + "</td><td>" + x.raw + (x.score > x.raw ? " +" + (x.score - x.raw) : "") + '</td><td class="total">' + x.score + "</td><td>" + (counted.has(x.player + "|" + x.club) ? '<span class="pill">Counted</span>' : "") + "</td></tr>").join("") + "</tbody>";
     fp.hidden = false;
   }
   pick.addEventListener("change", drawEvent);
@@ -607,8 +634,35 @@ function render(D, CUR) {
         : '<tr><td class="empty">No past seasons yet.</td></tr>') + "</tbody>";
   }
 
+  // ---- about page (text from about.md, schedule from the events list)
+  function md(src) {
+    const inline = t => esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|#[a-z-]+)\)/g, '<a href="$2">$1</a>')
+      .replace(/History tab/g, '<a href="#history">History tab</a>');
+    const out = []; let para = [], depth = 0;
+    const flushP = () => { if (para.length) { out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; } };
+    const setDepth = d => { while (depth < d) { out.push("<ul>"); depth++; } while (depth > d) { out.push("</ul>"); depth--; } };
+    for (const raw of (src || "").replace(/\r/g, "").split("\n")) {
+      const line = raw.replace(/\s+$/, ""), m = line.match(/^(\s*)[-*•]\s+(.*)$/);
+      if (m) { flushP(); setDepth(Math.floor(m[1].replace(/\t/g, "  ").length / 2) + 1); out.push("<li>" + inline(m[2]) + "</li>"); continue; }
+      if (!line.trim()) { flushP(); setDepth(0); continue; }
+      const h = line.match(/^(#{1,3})\s+(.*)$/);
+      if (h) { flushP(); setDepth(0); out.push((h[1].length <= 2 ? "<h2>" : "<h3>") + inline(h[2]) + (h[1].length <= 2 ? "</h2>" : "</h3>")); continue; }
+      setDepth(0); para.push(line.trim());
+    }
+    flushP(); setDepth(0); return out.join("");
+  }
+  document.getElementById("aboutText").innerHTML = md(CUR.about) || '<p class="muted">More information coming soon.</p>';
+  const nextIdx = R.findIndex((r, i) => !r.cancelled && !played[i]);
+  document.getElementById("schedTitle").textContent = D.season + " schedule";
+  document.getElementById("schedTable").innerHTML = "<tbody>" + R.map((r, i) => {
+    const st = r.cancelled ? '<span class="st cx">Cancelled</span>' : played[i] ? '<a class="st done" href="#events" data-round="' + i + '">Results</a>' : i === nextIdx ? '<span class="st next">Next</span>' : "";
+    return '<tr><td class="rn">' + r.n + "</td><td><b>" + esc(r.event) + "</b><small>" + esc([fmtDate(r.date, { weekday: "short", day: "numeric", month: "long" }), r.venue].filter(Boolean).join(" · ")) + "</small></td><td>" + st + "</td></tr>";
+  }).join("") + "</tbody>";
+  document.getElementById("schedTable").addEventListener("click", ev => { const a = ev.target.closest("[data-round]"); if (a) { pick.value = a.dataset.round; drawEvent(); } });
+  if (isPast) document.querySelector('nav.tabs a[data-view="about"]').hidden = true;
+
   // ---- routing
-  const views = ["clubs", "players", "events", "history", "check"];
+  const views = ["clubs", "players", "events", "history", "about", "check"];
   function route() {
     const v = views.includes(location.hash.slice(1)) ? location.hash.slice(1) : "clubs";
     views.forEach(n => { document.getElementById("view-" + n).hidden = n !== v; });

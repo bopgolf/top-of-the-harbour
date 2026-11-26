@@ -71,6 +71,8 @@ ol.steps { margin: 0 0 12px; padding-left: 20px; } ol.steps li { margin-bottom: 
 code { background: var(--stripe); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; font-size: 13px; }
 .muted { color: var(--muted); }
 .err { color: var(--bad); font-weight: 600; }
+.aprev h2 { font: 700 22px var(--display); margin: 14px 0 6px; } .aprev h3 { font: 700 17px var(--display); margin: 12px 0 4px; }
+.aprev p { margin: 0 0 10px; } .aprev ul { margin: 0 0 10px; padding-left: 20px; } .aprev li { margin-bottom: 3px; }
 [hidden] { display: none !important; }
 </style>
 </head>
@@ -89,6 +91,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
       <a href="#settings">Season settings</a>
       <a href="#look">Look &amp; sponsors</a>
       <a href="#history">History</a>
+      <a href="#about">About page</a>
       <a href="#status">Update status</a>
     </nav>
   </div>
@@ -152,7 +155,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
         <label for="fRound" data-f="round">Round<select id="fRound"></select></label>
         <label for="fPlayer" data-f="player">Player<input id="fPlayer" list="players" placeholder="Last, First" autocomplete="off"></label>
         <label for="fClub" data-f="club">Club<select id="fClub"></select></label>
-        <label for="fHoles" data-f="holes">Holes<select id="fHoles"><option value="">(unchanged)</option><option>18</option><option>9</option></select></label>
+        <label for="fHoles" data-f="holes">Holes<select id="fHoles"><option value="">(unchanged)</option><option>18</option><option>11</option><option>9</option></select></label>
         <label for="fPoints" data-f="points">Stableford points (raw)<input id="fPoints" type="number" min="0" max="80" inputmode="numeric"></label>
         <label for="fNew" data-f="new_value">Spelling to keep<input id="fNew" list="players" placeholder="Last, First" autocomplete="off"></label>
         <label class="wide" for="fNote">Note (optional, for your records)<input id="fNote" placeholder="e.g. Card corrected after event"></label>
@@ -172,7 +175,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
   <div class="panel">
     <h2>Upload results for an event</h2>
     <div class="pad">
-      <p class="hint">For an event that wasn't scored on Golf NZ. Copy the results from Excel (four columns: <strong>player, club, holes, points</strong>) and paste them below, or choose a CSV file. Enter <strong>raw</strong> stableford points; 9-hole cards get 17 added automatically.</p>
+      <p class="hint">For an event that wasn't scored on Golf NZ. Copy the results from Excel (four columns: <strong>player, club, holes, points</strong>) and paste them below, or choose a CSV file. Enter <strong>raw</strong> stableford points; 9-hole cards get 17 added and 11-hole cards 13 added automatically.</p>
       <div class="grid">
         <label for="uRound">Round<select id="uRound"></select></label>
         <label for="uFile">Or choose a CSV file<input id="uFile" type="file" accept=".csv,text/csv"></label>
@@ -209,6 +212,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
         <label for="sPer">Scores counting per club per event<input id="sPer" type="number" min="1" max="10"></label>
         <label for="sBest">Events counting toward club total<input id="sBest" type="number" min="1" max="20"></label>
         <label for="sAdd">Points added to 9-hole scores<input id="sAdd" type="number" min="0" max="36"></label>
+        <label for="sAdd11">Points added to 11-hole scores<input id="sAdd11" type="number" min="0" max="36" placeholder="13"></label>
         <label for="sInd">Events counting toward individual total<input id="sInd" type="number" min="0" max="20" placeholder="Every event"></label>
         <label for="sHeader">Main colour (header and totals)<input id="sHeader" type="color" style="height:42px;padding:3px"></label>
         <label for="sAccent">Highlight colour (scores that count)<input id="sAccent" type="color" style="height:42px;padding:3px"></label>
@@ -300,6 +304,7 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
           <label for="pPer">Scores counting per club per event<input id="pPer" type="number" min="1" max="10"></label>
           <label for="pBest">Events counting toward club total<input id="pBest" type="number" min="1" max="20"></label>
           <label for="pAdd">Points added to 9-hole scores<input id="pAdd" type="number" min="0" max="36"></label>
+          <label for="pAdd11">Points added to 11-hole scores<input id="pAdd11" type="number" min="0" max="36" placeholder="13"></label>
           <label for="pInd">Events counting toward individual total<input id="pInd" type="number" min="0" max="20" placeholder="Every event"></label>
           <label class="wide" for="pNote">Note shown on this season's page (optional)<textarea id="pNote" rows="2" style="font-family:var(--body);font-size:14px"></textarea></label>
         </div>
@@ -328,6 +333,30 @@ code { background: var(--stripe); border: 1px solid var(--line); border-radius: 
       <div class="scroll"><table id="honTable"></table></div>
       <datalist id="clubList"></datalist>
       <div class="row" style="margin-top:12px"><button class="ghost" id="addHon">Add a year</button><button id="saveHon">Save past winners</button><span class="muted" id="honMsg"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT PAGE ============ -->
+<section id="v-about" hidden>
+  <div class="panel">
+    <h2>About page</h2>
+    <div class="pad">
+      <p class="hint">This is the text on the leaderboard's <strong>About</strong> tab. The schedule beside it fills itself in from your events, so there's no need to type it here.</p>
+      <details style="margin-bottom:10px"><summary><strong>Formatting help</strong></summary>
+        <ul class="hint" style="margin-top:6px">
+          <li><code>## Heading</code>: a heading (start the line with two # and a space)</li>
+          <li><code>- item</code>: a bullet point. Put two spaces before the dash for a bullet inside a bullet.</li>
+          <li><code>**words**</code>: <strong>bold</strong></li>
+          <li><code>[link text](https://…)</code>: a link</li>
+          <li>Leave an empty line between paragraphs.</li>
+        </ul>
+      </details>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start">
+        <label for="aText">Text<textarea id="aText" rows="26" style="font-size:13.5px;line-height:1.5"></textarea></label>
+        <div><div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:3px">Preview</div><div id="aPrev" class="aprev" style="border:1px solid var(--line);border-radius:8px;padding:4px 16px 10px;max-height:640px;overflow:auto;background:var(--board)"></div></div>
+      </div>
+      <div class="row" style="margin-top:12px"><button id="aSave">Save about page</button><span class="muted" id="aMsg"></span></div>
     </div>
   </div>
 </section>
@@ -552,7 +581,7 @@ function fixFormState() {
   document.querySelectorAll("#fixForm [data-f]").forEach(l => (l.hidden = !FIELDS[a].includes(l.dataset.f)));
   const optional = !REQUIRED[a].includes("round");
   $("fRound").innerHTML = (optional ? '<option value="">Every round</option>' : "") + rounds().map(r => `<option value="${esc(r.round)}">Round ${esc(r.round)} – ${esc(r.event)}</option>`).join("");
-  $("fHoles").innerHTML = (a === "add" ? "" : '<option value="">(unchanged)</option>') + "<option>18</option><option>9</option>";
+  $("fHoles").innerHTML = (a === "add" ? "" : '<option value="">(unchanged)</option>') + "<option>18</option><option>11</option><option>9</option>";
   $("fixHelp").textContent = HELP[a];
 }
 $("fAction").addEventListener("change", fixFormState);
@@ -606,14 +635,14 @@ function parsePasted(text) {
   return rows.filter(r => r[0]).map(r => {
     let [player, club, holes, points] = r;
     if (r.length === 3) { points = holes; holes = "18"; } // player, club, points
-    return { player: tidyName(player), club: club || "", holes: holes === "9" ? "9" : holes ? holes : "18", points: points || "" };
+    return { player: tidyName(player), club: club || "", holes: holes ? String(parseInt(holes, 10) || holes) : "18", points: points || "" };
   });
 }
 function renderUpload() {
   upRows = parsePasted($("uText").value);
   const clubs = new Set(clubNames().map(c => c.toLowerCase()));
-  const problems = upRows.filter(r => !/^\d+$/.test(r.points) || !["9", "18"].includes(r.holes)).length;
-  $("uPreview").innerHTML = upRows.length ? `<p class="hint">${upRows.length} players. ${problems ? '<span class="err">' + problems + " row(s) need a number for points and 9 or 18 for holes.</span>" : ""}</p><div class="scroll"><table><thead><tr><th>Player</th><th>Club</th><th>Holes</th><th>Points</th></tr></thead><tbody>` +
+  const problems = upRows.filter(r => !/^\d+$/.test(r.points) || !["9", "11", "18"].includes(r.holes)).length;
+  $("uPreview").innerHTML = upRows.length ? `<p class="hint">${upRows.length} players. ${problems ? '<span class="err">' + problems + " row(s) need a number for points and 9, 11 or 18 for holes.</span>" : ""}</p><div class="scroll"><table><thead><tr><th>Player</th><th>Club</th><th>Holes</th><th>Points</th></tr></thead><tbody>` +
     upRows.map(r => `<tr><td>${esc(r.player)}</td><td>${esc(r.club)}${clubs.has(r.club.toLowerCase()) ? "" : ' <span class="pill run">not on club list</span>'}</td><td>${esc(r.holes)}</td><td>${/^\d+$/.test(r.points) ? esc(r.points) : '<span class="err">' + (esc(r.points) || "missing") + "</span>"}</td></tr>`).join("") + "</tbody></table></div>" : "";
   $("uSave").disabled = !upRows.length || problems > 0;
 }
@@ -683,7 +712,7 @@ $("saveClubs").addEventListener("click", ev => busy(ev.target, async () => {
 function fillClubSelect() { $("fClub").innerHTML = clubNames().map(c => `<option>${esc(c)}</option>`).join(""); }
 
 // ---------------------------------------------------------------- settings
-const SMAP = { sSeason: "season", sTitle: "title", sStatus: "status", sPer: "scores_per_club", sBest: "best_events", sAdd: "nine_hole_add", sInd: "individual_best_events", sHeader: "colour_header", sAccent: "colour_accent" };
+const SMAP = { sSeason: "season", sTitle: "title", sStatus: "status", sPer: "scores_per_club", sBest: "best_events", sAdd: "nine_hole_add", sAdd11: "eleven_hole_add", sInd: "individual_best_events", sHeader: "colour_header", sAccent: "colour_accent" };
 const DEFAULTS = { status: "Live", colour_header: "#12432f", colour_accent: "#e7b93c" };
 function renderSettings() { for (const [id, k] of Object.entries(SMAP)) $(id).value = setting(k) || DEFAULTS[k] || ""; preview(); }
 function preview() {
@@ -819,6 +848,37 @@ $("mDl").addEventListener("click", () => {
   setTimeout(() => URL.revokeObjectURL(a.href), 10000);
 });
 
+// ---------------------------------------------------------------- about page
+function md(src) {
+  const inline = t => esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|#[a-z-]+)\)/g, '<a href="$2">$1</a>');
+  const out = []; let para = [], depth = 0;
+  const flushP = () => { if (para.length) { out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; } };
+  const setDepth = d => { while (depth < d) { out.push("<ul>"); depth++; } while (depth > d) { out.push("</ul>"); depth--; } };
+  for (const raw of (src || "").replace(/\r/g, "").split("\n")) {
+    const line = raw.replace(/\s+$/, ""), m = line.match(/^(\s*)[-*•]\s+(.*)$/);
+    if (m) { flushP(); setDepth(Math.floor(m[1].replace(/\t/g, "  ").length / 2) + 1); out.push("<li>" + inline(m[2]) + "</li>"); continue; }
+    if (!line.trim()) { flushP(); setDepth(0); continue; }
+    const h = line.match(/^(#{1,3})\s+(.*)$/);
+    if (h) { flushP(); setDepth(0); out.push((h[1].length <= 2 ? "<h2>" : "<h3>") + inline(h[2]) + (h[1].length <= 2 ? "</h2>" : "</h3>")); continue; }
+    setDepth(0); para.push(line.trim());
+  }
+  flushP(); setDepth(0); return out.join("");
+}
+let aSha = null, aLoaded = false;
+async function loadAbout() {
+  if (aLoaded) return; aLoaded = true;
+  try { const j = await api(repoPath("/contents/about.md?ref=" + G.branch)); aSha = j.sha; $("aText").value = b64dec(j.content); }
+  catch (e) { if (e.status !== 404) { aLoaded = false; toast(explain(e).replace("Couldn't save: ", "Couldn't load: "), true); } }
+  $("aPrev").innerHTML = md($("aText").value);
+}
+$("aText").addEventListener("input", () => { $("aPrev").innerHTML = md($("aText").value); $("aMsg").textContent = "Unsaved changes."; });
+$("aSave").addEventListener("click", ev => busy(ev.target, async () => {
+  try { aSha = await save("about.md", $("aText").value.replace(/\s+$/, "") + "\n", "Update about page (organiser page)", aSha); }
+  catch (e) { if (e.status === 409 || e.status === 422) { aLoaded = false; toast("The about page was changed somewhere else. Reloading it; please make your change again.", true); await loadAbout(); return; } throw e; }
+  await api(repoPath("/actions/workflows/update.yml/dispatches"), { method: "POST", body: JSON.stringify({ ref: G.branch }) }).catch(() => {});
+  toast(savedMsg); $("aMsg").textContent = "Saved " + new Date().toLocaleTimeString("en-NZ");
+}));
+
 // ---------------------------------------------------------------- history
 async function archived(season) { try { await api(repoPath("/contents/data/seasons/" + season + ".json?ref=" + G.branch)); return true; } catch (e) { if (e.status === 404) return false; throw e; } }
 async function renderHistory() {
@@ -892,7 +952,7 @@ $("pastPick").addEventListener("change", async ev => {
 });
 function renderPast() {
   const S = P.settings || {};
-  $("pPer").value = S.perClub; $("pBest").value = S.bestEvents; $("pAdd").value = S.nineHoleAdd; $("pInd").value = S.indBest || ""; $("pNote").value = P.note || "";
+  $("pPer").value = S.perClub; $("pBest").value = S.bestEvents; $("pAdd").value = S.nineHoleAdd; $("pAdd11").value = S.elevenHoleAdd != null ? S.elevenHoleAdd : ""; $("pInd").value = S.indBest || ""; $("pNote").value = P.note || "";
   $("pRounds").innerHTML = "<thead><tr><th>Round</th><th>Event</th><th>Short name</th><th>Date</th><th>Cancelled</th><th title='Counts for every club on top of their best events'>Always counts</th></tr></thead><tbody>" +
     P.rounds.map((r, i) => `<tr><td><strong>${r.n}</strong></td><td><input data-pr="${i}" data-k="event" value="${esc(r.event)}"></td><td><input data-pr="${i}" data-k="short" value="${esc(r.short)}" style="width:120px"></td>
       <td><input data-pr="${i}" data-k="date" type="date" value="${esc(r.date)}"></td><td><input data-pr="${i}" data-k="cancelled" type="checkbox" ${r.cancelled ? "checked" : ""} style="width:auto"></td><td><input data-pr="${i}" data-k="always" type="checkbox" ${r.always ? "checked" : ""} style="width:auto"></td></tr>`).join("") + "</tbody>";
@@ -911,7 +971,7 @@ function renderPastResults() {
   idx.sort((a, b) => P.results[a][0] - P.results[b][0] || P.results[a][2].localeCompare(P.results[b][2]) || P.results[b][4] - P.results[a][4]);
   $("pResults").innerHTML = "<thead><tr><th>Round</th><th>Player</th><th>Club</th><th>Holes</th><th>Points</th><th></th></tr></thead><tbody>" +
     (idx.length ? idx.map(i => { const r = P.results[i]; return `<tr><td><select data-rr="${i}" data-c="0">${roundOpts(r[0])}</select></td><td><input data-rr="${i}" data-c="1" value="${esc(r[1])}" style="min-width:200px"></td>
-      <td><select data-rr="${i}" data-c="2">${clubOpts(r[2])}</select></td><td><select data-rr="${i}" data-c="3"><option ${r[3] === 18 ? "selected" : ""}>18</option><option ${r[3] === 9 ? "selected" : ""}>9</option></select></td>
+      <td><select data-rr="${i}" data-c="2">${clubOpts(r[2])}</select></td><td><select data-rr="${i}" data-c="3"><option ${r[3] === 18 ? "selected" : ""}>18</option><option ${r[3] === 11 ? "selected" : ""}>11</option><option ${r[3] === 9 ? "selected" : ""}>9</option></select></td>
       <td><input data-rr="${i}" data-c="4" type="number" min="0" max="99" value="${r[4]}" style="width:80px"></td><td><button class="danger" data-rdel="${i}">Remove</button></td></tr>`; }).join("")
       : '<tr><td colspan="6" class="muted">No results match.</td></tr>') + "</tbody>";
 }
@@ -922,7 +982,7 @@ $("pastEditor").addEventListener("input", ev => {
   if (d.pr !== undefined) { const r = P.rounds[+d.pr]; r[d.k] = t.type === "checkbox" ? t.checked : t.value.trim(); if (d.k === "always" && !t.checked) delete r.always; pDirtyNote(); }
   else if (d.rr !== undefined) { const r = P.results[+d.rr], c = +d.c; r[c] = c === 0 || c === 3 || c === 4 ? (parseInt(t.value, 10) || 0) : t.value.trim(); pDirtyNote(); }
   else if (d.pce !== undefined) { P.clubs[+d.pce].bop = t.value !== "No"; pDirtyNote(); }
-  else if (["pPer", "pBest", "pAdd", "pInd", "pNote"].includes(t.id)) pDirtyNote();
+  else if (["pPer", "pBest", "pAdd", "pAdd11", "pInd", "pNote"].includes(t.id)) pDirtyNote();
 });
 $("pastEditor").addEventListener("change", ev => {
   const t = ev.target;
@@ -953,7 +1013,7 @@ $("pCancel").addEventListener("click", () => { pDirty = false; $("pastPick").val
 $("pSave").addEventListener("click", ev => busy(ev.target, async () => {
   const bad = P.results.findIndex(r => !r[1] || !P.clubs.some(c => c.name === r[2]) || !(r[4] >= 0));
   if (bad >= 0) { toast("A result in Round " + P.results[bad][0] + " is missing a player name, club or points.", true); $("pFRound").value = String(P.results[bad][0]); $("pFText").value = ""; renderPastResults(); return; }
-  P.settings = { perClub: parseInt($("pPer").value, 10) || 3, bestEvents: parseInt($("pBest").value, 10) || 6, nineHoleAdd: parseInt($("pAdd").value, 10) || 0, indBest: parseInt($("pInd").value, 10) || 0 };
+  P.settings = { perClub: parseInt($("pPer").value, 10) || 3, bestEvents: parseInt($("pBest").value, 10) || 6, nineHoleAdd: parseInt($("pAdd").value, 10) || 0, elevenHoleAdd: $("pAdd11").value === "" ? 13 : parseInt($("pAdd11").value, 10) || 0, indBest: parseInt($("pInd").value, 10) || 0 };
   P.note = $("pNote").value.trim() || null;
   P.results.forEach(r => (r[1] = tidyName(r[1])));
   try { pSha = await save("data/seasons/" + pYear + ".json", JSON.stringify(P), "Edit " + pYear + " season (organiser page)", pSha); }
@@ -980,7 +1040,7 @@ $("runNow").addEventListener("click", ev => busy(ev.target, async () => {
 }));
 
 // ---------------------------------------------------------------- shell
-const VIEWS = ["events", "fixes", "upload", "clubs", "settings", "look", "history", "status"];
+const VIEWS = ["events", "fixes", "upload", "clubs", "settings", "look", "history", "about", "status"];
 function route() {
   if (!G.token) return;
   const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "events";
@@ -988,6 +1048,7 @@ function route() {
   document.querySelectorAll("#tabs a").forEach(a => (a.getAttribute("href") === "#" + v ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
   if (v === "status") renderRuns();
   if (v === "history") { renderHistory(); loadPastList(); }
+  if (v === "about") loadAbout();
 }
 function render() {
   renderEvents(); renderFixes(); renderClubs(); renderSettings(); fillClubSelect(); fixFormState(); renderLook(); renderTile(); if (!mReady) loadSeasons();
