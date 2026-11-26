@@ -206,7 +206,7 @@
    "n": 5,
    "event": "Futures Geyserland Open",
    "short": "Futures Geyserland Open",
-   "venue": "Lake View GC",
+   "venue": "Springfield GC",
    "date": "2027-06-13",
    "cancelled": false,
    "sources": []
@@ -456,6 +456,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "bbee332a2c19636c8c133702436e60582cb33f23d21af0d227f72aa3de96d184",
- "updated": "2026-11-26T00:50+00:00"
+ "digest": "1fca343d65ac3b74fbeadd6c9e300335707a6c1813920ce4b52407eee36d1a04",
+ "updated": "2026-11-26T01:37+00:00"
 }
