@@ -143,6 +143,7 @@
    "note": ""
   }
  ],
+ "about": "## What is the Top of the Harbour?\n\nTop of the Harbour is where clubs compete as teams for the Top of the Harbour trophy. It is open to all clubs in the Bay of Plenty, with Futures Open events spread from February through to November. The events are existing and new club junior and Futures opens, all fully supported by Bay of Plenty Golf.\n\nThe events are about motivating, encouraging, and building confidence and competency in young golfers who aspire to be the best they can be.\n\n2027 is the **46th year** of the Top of the Harbour, which began in 1982. See past winners on the History tab.\n\n## Who is it for?\n\nTop of the Harbour events are for youth (under 19) who aspire to be the best they can be. This may look like:\n\n- Players who have a desire to improve their game\n- Players who are willing to be challenged\n- Players who are developing their skills and confidence\n- Players who love the game and the opportunities\n\nAll events are open to all under-19 players who are a member of a New Zealand golf club and hold a current handicap.\n\nThe events fit into the \"Develop and Perform\" stage of the Bay of Plenty Young Peoples Plan framework, which can then lead players into the Bay of Plenty Talent Development Plan.\n\n## Format and scoring\n\n**Event formats:** 18 and 9 hole stableford. Players must have a handicap.\n\n- Only Bay of Plenty golf clubs are eligible to win the Top of the Harbour trophy. This includes golf clubs in the Thames Valley region, for which Bay of Plenty Golf administers women's golf.\n- The best three individual stableford scores count towards each player's home club total at each event.\n  - If there are three or fewer players from a club at an event, all of their scores count.\n  - Each club can have as many players as it wishes in its team at each event.\n- 9 hole scores are the 9 hole stableford score plus 17 points for the other 9 holes, to make an 18 hole score (in accordance with the WHS).\n  - The Waihi Futures Open has an 11 hole event. For this, 13 points are added to make an 18 hole score.\n\n**Club teams:** each club's best 7 of 11 event scores count towards its total. Ties are decided by the best single-event club total, then the best individual score in that event. If still tied, the position is shared.\n\n**Individuals:** each player's best 7 of 11 event scores count towards their total. Ties are decided by the next-best score that isn't counted, then most events played, then best single round. If still tied, the position is shared.\n",
  "brand": {
   "logo": "logos/brand-logo.png",
   "eyebrow": "Top of the Harbour Tour | Bay of Plenty Futures Opens",
@@ -161,6 +162,7 @@
   "perClub": 3,
   "bestEvents": 7,
   "nineHoleAdd": 17,
+  "elevenHoleAdd": 13,
   "indBest": 7
  },
  "rounds": [
@@ -454,6 +456,6 @@
  "results": [],
  "excluded": [],
  "warnings": [],
- "digest": "cec6ce6183321ae531b5c0a9cf5b2e9da961f8055fdbbb6418d0d8f075874e91",
- "updated": "2026-11-25T21:00+00:00"
+ "digest": "87e4c7da13d781b1dc81f58bf1262a2f9bfc3749985b09397f91e9d47cad4b15",
+ "updated": "2026-11-26T00:47+00:00"
 }
