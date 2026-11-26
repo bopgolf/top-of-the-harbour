@@ -210,7 +210,7 @@ def fetch_golfgenius(src):
             if head and "stableford" not in head.group(1).lower():
                 warn(f"Golf Genius event '{tname or turl}' shows {head.group(1)}, not stableford points, so it was skipped.")
                 continue
-            holes = 9 if re.search(r"\b9\s*-?\s*hole", tname, re.I) else 18
+            holes = 9 if re.search(r"\b9\s*-?\s*hole", tname, re.I) else 11 if re.search(r"\b11\s*-?\s*hole", tname, re.I) else 18
             names.append(tname)
             for m in re.finditer(r"""<tr class=['"][^'"]*aggregate-row[^'"]*['"][^>]*data-aggregate-name=['"]([^'"]*)['"][\s\S]*?</tr>""", t):
                 block = m.group(0)
@@ -267,6 +267,7 @@ def main():
         "perClub": to_int(settings.get("scores_per_club"), 3),
         "bestEvents": to_int(settings.get("best_events"), 6),
         "nineHoleAdd": to_int(settings.get("nine_hole_add"), 17),
+        "elevenHoleAdd": to_int(settings.get("eleven_hole_add"), 13),
         "indBest": to_int(settings.get("individual_best_events"), 0),   # 0 = every event counts
     }
     rounds_in = read_csv("rounds.csv")
@@ -389,8 +390,8 @@ def main():
         if not club:
             excluded.append({"round": x["round"], "player": x["player"], "club": x["club"] or "(no club given – add a club fix)", "points": x["points"], "source": x["source"]})
             continue
-        if x["holes"] not in (9, 18):
-            warn(f"Round {x['round']}: {x['player']} has holes={x['holes']}; treated as 18.")
+        if x["holes"] not in (9, 11, 18):
+            warn(f"Round {x['round']}: {x['player']} has holes={x['holes']}; treated as 18 (only 9, 11 and 18 holes are converted).")
             x["holes"] = 18
         k = (x["round"], key(x["player"]))
         if k in seen:
@@ -423,6 +424,7 @@ def main():
         "theme": {k: v for k, v in (("header", settings.get("colour_header", "")), ("accent", settings.get("colour_accent", "")))
                   if re.fullmatch(r"#[0-9a-fA-F]{6}", v or "")},
         "archive": archive, "honours": honours,
+        "about": open(os.path.join(ROOT, "about.md"), encoding="utf-8").read() if os.path.exists(os.path.join(ROOT, "about.md")) else "",
         "brand": {"logo": settings.get("header_logo", ""), "eyebrow": settings.get("eyebrow", "Bay of Plenty Golf · Futures Series"), "intro": settings.get("intro", ""),
                   "tile_bg": settings.get("tile_background", ""), "tile_title": settings.get("tile_title", "")},
         "sponsors": [{"name": x.get("name", ""), "logo": x.get("logo", ""), "link": x.get("link", "")}
